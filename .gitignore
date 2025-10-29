@@ -1,0 +1,45 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go build output
+/bin/
+/build/
+/dist/
+/tmp/
+/coverage.out
+/main
+*.log
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependency directories (if vendor mode)
+vendor/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment & configuration
+.env
+.env.*
+config.yaml
+config.yml
+
+# Docker
+docker-compose.override.yml
+*.pid
+
+# Testing
+*.coverprofile
+*.cov
+*.prof
