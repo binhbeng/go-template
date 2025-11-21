@@ -5,38 +5,37 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/binhbeng/goex/config"
+	// "github.com/binhbeng/goex/internal/middleware"
 	"github.com/gin-gonic/gin"
-	// "github.com/wannanbigpig/gin-layout/config"
-	// "github.com/wannanbigpig/gin-layout/internal/middleware"
-	// "github.com/wannanbigpig/gin-layout/internal/pkg/errors"
 )
 
 func SetRouters() *gin.Engine {
 	var engine *gin.Engine
 
-	if false {
-		engine = ReleaseRouter()
-		// engine.Use(
-		// 	middleware.RequestCostHandler(),
-		// 	middleware.CustomLogger(),
-		// 	middleware.CustomRecovery(),
-		// 	middleware.CorsHandler(),
-		// )
-	} else {
+	if !config.C.App.Debug {
 		engine = gin.New()
 		engine.Use(
 			// middleware.RequestCostHandler(),
 			gin.Logger(),
+			gin.Recovery(),
+			// middleware.CustomLogger(),
 			// middleware.CustomRecovery(),
 			// middleware.CorsHandler(),
 		)
+	} else {
+		engine = ReleaseRouter()
+		engine.Use(
+			// 	middleware.RequestCostHandler(),
+			gin.Recovery(),
+		)
 	}
-	// set up trusted agents
+
 	err := engine.SetTrustedProxies([]string{"127.0.0.1"})
 	if err != nil {
 		panic(err)
 	}
-	// ping
+
 	engine.GET("/ping", func(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"message": "pong!",
@@ -46,7 +45,7 @@ func SetRouters() *gin.Engine {
 	SetAuthApiRoute(engine)
 
 	engine.NoRoute(func(c *gin.Context) {
-		fmt.Println("🔍 ~ SetRouters ~ internal/routers/router.go:48 ~ response2:")
+		fmt.Println("NoRoute")
 	})
 
 	return engine

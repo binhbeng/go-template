@@ -1,0 +1,28 @@
+app:
+  app_env: local
+  enable_body_log: true
+  debug: true
+  language: zh_CN
+jwt:
+  ttl: 7200
+  refresh_ttl: 3600
+  secret_key: Wj7rctFCgio1UxDXQEQbr64S5Q4JNQQthee9PcAKxFnZXFcnUlMlj8uBTfSi9xGq
+postgre:
+  enable: false
+  host: localhost
+  port: 5432
+  database: goapp
+  username: binhbeng
+  password: 1998
+  charset: utf8mb4
+  table_prefix: ""
+  max_idle_conns: 10
+  max_open_conns: 100
+  max_lifetime: 3600s
+  print_sql: false
+redis:
+  enable: false
+  host: 127.0.0.1
+  port: 6379
+  password:
+  database: 0

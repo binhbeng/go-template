@@ -2,21 +2,23 @@ package data
 
 import (
 	"context"
+	"fmt"
+	"log"
+
+	"github.com/binhbeng/goex/config"
 	"github.com/go-redis/redis/v8"
 )
 
 var Rdb *redis.Client
 
 func initRedis() {
-	// Rdb = redis.NewClient(&redis.Options{
-	// 	Addr:     c.Config.Redis.Host + ":" + c.Config.Redis.Port,
-	// 	Password: c.Config.Redis.Password,
-	// 	DB:       c.Config.Redis.Database,
-	// })
+
+	addr := fmt.Sprintf("%s:%d", config.C.Redis.Host, config.C.Redis.Port)
+
 	Rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost" + ":" + "6379",
-		Password: "",
-		DB:       0,
+		Addr:     addr,
+		Password: config.C.Redis.Password,
+		DB:       config.C.Redis.Database,
 	})
 	var ctx = context.Background()
 	_, err := Rdb.Ping(ctx).Result()
@@ -24,4 +26,5 @@ func initRedis() {
 	if err != nil {
 		panic("Redis connection failed：" + err.Error())
 	}
+	log.Println("✅ Redis connected")
 }
