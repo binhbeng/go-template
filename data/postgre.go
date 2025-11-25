@@ -21,13 +21,52 @@ type Writer interface {
 type WriterLog struct{}
 
 func (w WriterLog) Printf(format string, args ...any) {
-	if config.C.PostgreDB.PrintSql {
+	if config.Cfg.PostgreDB.PrintSql {
 		s := fmt.Sprintf(format, args...)
 		fmt.Println(s)
 	}
 }
 
-func initPostgre() {
+// func initPostgre() {
+// 	logConfig := logger.New(
+// 		WriterLog{},
+// 		logger.Config{
+// 			SlowThreshold:             0,
+// 			LogLevel:                  logger.LogLevel(4),
+// 			IgnoreRecordNotFoundError: false,
+// 			Colorful:                  false,
+// 		},
+// 	)
+
+// 	configs := &gorm.Config{
+// 		NamingStrategy: schema.NamingStrategy{
+// 			TablePrefix: "",
+// 		},
+// 		Logger: logConfig,
+// 	}
+
+// 	db := config.Cfg.PostgreDB
+// 	dsn := fmt.Sprintf(
+// 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
+// 		db.Host, db.Username, db.Password, db.Database, db.Port,
+// 	)
+// 	var err error
+
+// 	PostgreDB, err = gorm.Open(postgres.Open(dsn), configs)
+
+// 	if err != nil {
+// 		panic("PostgreSQL connection failed：" + err.Error())
+// 	} else {
+// 		log.Println("✅ PostgreSQL connection success")
+// 	}
+
+// 	sqlDB, _ := PostgreDB.DB()
+// 	sqlDB.SetMaxIdleConns(10)
+// 	sqlDB.SetMaxOpenConns(100)
+// 	sqlDB.SetConnMaxLifetime(time.Hour)
+// }
+
+func NewPostgreDB() (*gorm.DB, error) {
 	logConfig := logger.New(
 		WriterLog{},
 		logger.Config{
@@ -45,23 +84,22 @@ func initPostgre() {
 		Logger: logConfig,
 	}
 
-	db := config.C.PostgreDB
+	dbCfg := config.Cfg.PostgreDB
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-		db.Host, db.Username, db.Password, db.Database, db.Port,
+		dbCfg.Host, dbCfg.Username, dbCfg.Password, dbCfg.Database, dbCfg.Port,
 	)
-	var err error
 
-	PostgreDB, err = gorm.Open(postgres.Open(dsn), configs)
-
+	db, err := gorm.Open(postgres.Open(dsn), configs)
 	if err != nil {
-		panic("PostgreSQL connection failed：" + err.Error())
-	} else {
-		log.Println("✅ PostgreSQL connection success")
+		return nil, fmt.Errorf("PostgreSQL connection failed: %w", err)
 	}
 
-	sqlDB, _ := PostgreDB.DB()
+	sqlDB, _ := db.DB()
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	log.Println("✅ PostgreSQL connection success")
+	return db, nil
 }

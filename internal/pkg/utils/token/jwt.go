@@ -2,16 +2,12 @@ package token
 
 import (
 	"errors"
-
-	"github.com/golang-jwt/jwt/v5"
-
-	// c "github.com/wannanbigpig/gin-layout/config"
 	"strings"
 	"time"
-
+	"github.com/binhbeng/goex/config"
 	"github.com/binhbeng/goex/internal/global"
 	"github.com/binhbeng/goex/internal/model"
-	e "github.com/binhbeng/goex/internal/pkg/errors"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type JwtPayload struct {
@@ -27,7 +23,7 @@ func GetJwtPayload(info any) (jwtPayload JwtPayload) {
 func Generate(claims jwt.Claims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenStr, err := token.SignedString([]byte("c.Config.Jwt.SecretKey"))
+	tokenStr, err := token.SignedString([]byte(config.Cfg.Jwt.SecretKey))
 	if err != nil {
 		return "", err
 	}
@@ -40,7 +36,7 @@ func Refresh(claims jwt.Claims) (string, error) {
 
 func Parse(accessToken string, claims jwt.Claims, options ...jwt.ParserOption) error {
 	token, err := jwt.ParseWithClaims(accessToken, claims, func(token *jwt.Token) (i any, err error) {
-		return []byte("c.Config.Jwt.SecretKey"), err
+		return []byte(config.Cfg.Jwt.SecretKey), err
 	}, options...)
 	if err != nil {
 		return err
@@ -50,7 +46,7 @@ func Parse(accessToken string, claims jwt.Claims, options ...jwt.ParserOption) e
 		return nil
 	}
 
-	return e.NewBusinessError(1, "invalid token")
+	return errors.New("invalid token")
 }
 
 func GetAccessToken(authorization string) (accessToken string, err error) {

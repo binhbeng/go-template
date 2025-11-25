@@ -1,52 +1,42 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/binhbeng/goex/internal/api/form"
 	"github.com/binhbeng/goex/internal/model"
-	"github.com/binhbeng/goex/internal/pkg/response"
 	"github.com/binhbeng/goex/internal/pkg/utils/token"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 )
 
 type UserService interface {
-	Login(username, password string) (*LoginResponse, error)
-	Me(c *gin.Context, userId uint)
-	Update(c *gin.Context, userId uint, data *model.User)
+	Login(username, password string) (*form.LoginResponse, error)
+	Me(c *gin.Context, userId uint) (*form.UserResponse, error)
+	UpdateProfile(c *gin.Context, userId uint, data *form.UpdateUserRequest) error
 }
 
 type userService struct {
-	userRepo *model.User
-	// *Service
+	userRepo *model.UserRepository
+	redis    *redis.Client
 }
 
-func NewUserService(
-	// service *Service,
-	userRepo *model.User,
-) UserService {
+func NewUserService(userRepo *model.UserRepository, redis *redis.Client) UserService {
 	return &userService{
 		userRepo: userRepo,
-		// Service:  service,
+		redis:    redis,
 	}
 }
 
-type LoginResponse struct {
-	User        model.User `json:"user"`
-	AccessToken string     `json:"access_token"`
-}
-
-type UserResponse struct {
-	model.User
-}
-
-func (u *userService) Login(username, password string) (*LoginResponse, error) {
-	// userModel := model.NewUser()
-	user := model.User{}
-	if err := u.userRepo.DB().Where("username = ?", username).First(&user).Error; err != nil {
+func (s *userService) Login(username, password string) (*form.LoginResponse, error) {
+	var user model.User
+	if err := s.userRepo.DB().Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}
+
 	now := time.Now()
-	expiresAt := now.Add(24 * time.Hour)
+	expiresAt := now.Add(24 * 30 * time.Hour)
 	claim := token.NewCustomClaims(&user, expiresAt)
 	accessToken, err := token.Generate(claim)
 
@@ -54,27 +44,29 @@ func (u *userService) Login(username, password string) (*LoginResponse, error) {
 		return nil, err
 	}
 
-	return &LoginResponse{
+	return &form.LoginResponse{
 		User:        user,
 		AccessToken: accessToken,
 	}, nil
 }
 
-func (u *userService) Me(c *gin.Context, userId uint) {
-	userModel := model.NewUser()
-	user := userModel.GetUserById(userId)
+func (s *userService) Me(c *gin.Context, userId uint) (*form.UserResponse, error) {
+	user, err := s.userRepo.GetUserById(userId)
 
-	if user != nil {
-		response.SuccessResponse(c, 200, "OK", UserResponse{*user})
+	if err != nil {
+		return nil, err
 	}
+
+	return &form.UserResponse{
+		Id:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+	}, nil
 }
 
-func (u *userService) Update(c *gin.Context, userId uint, form *model.User) {
+func (s *userService) UpdateProfile(c *gin.Context, userId uint, form *form.UpdateUserRequest) error {
+	now := time.Now()
+	s.redis.Set(c, "last_updated:"+fmt.Sprint(userId), now, 0)
 
-	if err := u.userRepo.DB().Where("id = ?", userId).Updates(form).Error; err != nil {
-		response.ErrorResponse(c, 500, "Error hehe", err, nil)
-		return
-	}
-
-	response.SuccessResponse(c, 200, "OK", nil)
+	return s.userRepo.DB(&model.User{}).Where("id = ?", userId).Updates(form).Error
 }

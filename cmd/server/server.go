@@ -2,8 +2,9 @@ package server
 
 import (
 	"fmt"
-	"github.com/binhbeng/goex/data"
-	"github.com/binhbeng/goex/internal/routers"
+
+	"github.com/binhbeng/goex/internal/router"
+	"github.com/binhbeng/goex/wire"
 	"github.com/spf13/cobra"
 )
 
@@ -13,14 +14,14 @@ var (
 		Short:   "Start API server",
 		Example: "go run main.go server",
 		PreRun: func(cmd *cobra.Command, args []string) {
-			data.InitData()
+
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run()
 		},
 	}
-	host     string
-	port     int
+	host string
+	port int
 )
 
 func init() {
@@ -29,10 +30,16 @@ func init() {
 }
 
 func run() error {
-	engine := routers.SetRouters()
-	err := engine.Run(fmt.Sprintf("%s:%d", host, port))
+	deps, err := wire.NewWire()
 	if err != nil {
 		return err
 	}
+
+	engine := router.SetRouters(deps)
+	err = engine.Run(fmt.Sprintf("%s:%d", host, port))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

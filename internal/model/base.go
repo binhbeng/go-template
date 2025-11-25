@@ -14,11 +14,26 @@ type BaseModel struct {
 	UpdatedAt utils.FormatDate `gorm:"column:updated_at;type:timestamp" json:"updated_at"`
 }
 
-func (m *BaseModel) DB(model ...any) *gorm.DB {
+type BaseModelWithSoftDelete struct {
+	BaseModel
+	DeletedAt soft_delete.DeletedAt `gorm:"column:deleted_at;type:int(11) unsigned;not null;default:0;index;" json:"-"`
+}
+
+type Repository struct {
+	db *gorm.DB
+}
+
+func NewRepository(db *gorm.DB) *Repository {
+	return &Repository{
+		db: db,
+	}
+}
+
+func (m *Repository) DB(model ...any) *gorm.DB {
 	return DB(model...)
 }
 
-func (m *BaseModel) Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
+func (m *Repository) Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		offset := 0
 		limit := global.PerPage
@@ -33,7 +48,7 @@ func (m *BaseModel) Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
-func (m *BaseModel) Count(model any, condition string, args []any) (count int64, err error) {
+func (m *Repository) Count(model any, condition string, args []any) (count int64, err error) {
 	query := m.DB(model)
 	if condition != "" {
 		query = query.Where(condition, args...)
@@ -43,11 +58,6 @@ func (m *BaseModel) Count(model any, condition string, args []any) (count int64,
 		return 0, err
 	}
 	return
-}
-
-type ContainsDeleteBaseModel struct {
-	BaseModel
-	DeletedAt soft_delete.DeletedAt `gorm:"column:deleted_at;type:int(11) unsigned;not null;default:0;index;" json:"-"`
 }
 
 func DB(model ...any) *gorm.DB {

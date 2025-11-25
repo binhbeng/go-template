@@ -9,22 +9,20 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-var Rdb *redis.Client
+func NewRedis() (*redis.Client, error) {
+	addr := fmt.Sprintf("%s:%d", config.Cfg.Redis.Host, config.Cfg.Redis.Port)
 
-func initRedis() {
-
-	addr := fmt.Sprintf("%s:%d", config.C.Redis.Host, config.C.Redis.Port)
-
-	Rdb = redis.NewClient(&redis.Options{
+	rdb := redis.NewClient(&redis.Options{
 		Addr:     addr,
-		Password: config.C.Redis.Password,
-		DB:       config.C.Redis.Database,
+		Password: config.Cfg.Redis.Password,
+		DB:       config.Cfg.Redis.Database,
 	})
-	var ctx = context.Background()
-	_, err := Rdb.Ping(ctx).Result()
 
-	if err != nil {
-		panic("Redis connection failed：" + err.Error())
+	ctx := context.Background()
+	if _, err := rdb.Ping(ctx).Result(); err != nil {
+		return nil, fmt.Errorf("redis connection failed: %w", err)
 	}
+
 	log.Println("✅ Redis connected")
+	return rdb, nil
 }

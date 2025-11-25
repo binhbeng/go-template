@@ -1,23 +1,30 @@
 package model
 
 type User struct {
-	ContainsDeleteBaseModel
-	Username string `json:"username"` 
+	BaseModelWithSoftDelete
+	Username string `json:"username"`
 	Password string `json:"-"`
-	Email    string `json:"email"`   
+	Email    string `json:"email"`
 }
 
-func NewUser() *User {
-	return &User{}
+type UserRepository struct {
+	*Repository
 }
 
-func (m *User) TableName() string {
+func NewUserRepository(r *Repository) *UserRepository {
+	return &UserRepository{
+		Repository: r,
+	}
+}
+
+func (m *UserRepository) TableName() string {
 	return "users"
 }
 
-func (m *User) GetUserById(id uint) *User {
-	if err := m.DB().First(m, id).Error; err != nil {
-		return nil
+func (m *UserRepository) GetUserById(id uint) (*User, error) {
+	var user User
+	if err := m.DB().First(&user, id).Error; err != nil {
+		return nil, err
 	}
-	return m
+	return &user, nil
 }

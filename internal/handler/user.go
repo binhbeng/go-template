@@ -1,11 +1,9 @@
 package handler
 
 import (
-	"github.com/binhbeng/goex/internal/model"
-	"github.com/binhbeng/goex/internal/pkg/response"
+	"github.com/binhbeng/goex/internal/api"
+	"github.com/binhbeng/goex/internal/api/form"
 	"github.com/binhbeng/goex/internal/service"
-	"github.com/binhbeng/goex/internal/validator"
-	"github.com/binhbeng/goex/internal/validator/form"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,34 +20,43 @@ func NewUserHandler(handler *Handler, userService service.UserService) *UserHand
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
-	// panic("hehe")
-	loginForm := form.NewLoginForm()
-	if err := validator.CheckPostParams(c, &loginForm); err != nil {
+	loginForm := new(form.LoginAuth)
+	if err := api.CheckPostParams(c, &loginForm); err != nil {
 		return
 	}
 
 	data, err := h.userService.Login(loginForm.Username, loginForm.Password)
 	if err != nil {
-		response.ErrorResponse(c, 500, "Error hehe", err, nil)
+		api.HandleError(c, 500, "Login failed", err, nil)
 		return
 	}
 
-	response.SuccessResponse(c, 200, "OK", data)
+	api.HandleSuccess(c, 200, "OK", data)
 }
 
 func (h *UserHandler) Me(c *gin.Context) {
 	userId := GetUserIdFromCtx(c)
-	h.userService.Me(c, userId)
-}
+	user, err := h.userService.Me(c, userId)
 
-func (h *UserHandler) Update(c *gin.Context) {
-	userId := GetUserIdFromCtx(c)
-	updateUserForm := form.NewUpdateUserForm()
-	if err := validator.CheckPostParams(c, &updateUserForm); err != nil {
+	if err != nil {
+		api.HandleError(c, 500, "Get profile failed", err, nil)
 		return
 	}
 
-	h.userService.Update(c, userId, &model.User{
-		Email: updateUserForm.Email,
-	})
+	api.HandleSuccess(c, 200, "OK", user)
+}
+
+func (h *UserHandler) UpdateProfile(c *gin.Context) {
+	userId := GetUserIdFromCtx(c)
+	var updateUserForm form.UpdateUserRequest
+	if err := api.CheckPostParams(c, &updateUserForm); err != nil {
+		return
+	}
+
+	if err := h.userService.UpdateProfile(c, userId, &updateUserForm); err != nil {
+		api.HandleError(c, 500, "Update failed", err, nil)
+		return
+	}
+
+	api.HandleSuccess(c, 200, "OK")
 }

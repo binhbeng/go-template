@@ -16,7 +16,7 @@ type Config struct {
 		Language string `mapstructure:"language" yaml:"language"`
 	} `mapstructure:"app" yaml:"app"`
 
-	JWT struct {
+	Jwt struct {
 		TTL        int    `mapstructure:"ttl" yaml:"ttl"`
 		RefreshTTL int    `mapstructure:"refresh_ttl" yaml:"refresh_ttl"`
 		SecretKey  string `mapstructure:"secret_key" yaml:"secret_key"`
@@ -46,7 +46,7 @@ type Config struct {
 	} `mapstructure:"redis" yaml:"redis"`
 }
 
-var C *Config
+var Cfg *Config
 
 func init() {
 	v := viper.New()
@@ -65,6 +65,6 @@ func init() {
 		log.Fatalf("❌ Unable to decode config: %v", err)
 	}
 
-	C = &cfg
+	Cfg = &cfg
 	log.Println("✅ Config loaded successfully.")
 }

@@ -1,5 +1,7 @@
-BEGIN;
-
+-- +goose Up
+-- +goose StatementBegin
+SELECT 'up SQL query';
+-- +goose StatementEnd
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(30) NOT NULL DEFAULT '',
@@ -10,4 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     deleted_at INT NOT NULL DEFAULT 0
 );
 
-COMMIT;
+-- +goose Down
+-- +goose StatementBegin
+SELECT 'down SQL query';
+-- +goose StatementEnd

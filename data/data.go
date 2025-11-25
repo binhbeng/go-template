@@ -8,7 +8,7 @@ var once sync.Once
 
 func InitData() {
 	once.Do(func() {
-			initPostgre()
-			initRedis()
+			// initPostgre()
+			// initRedis()
 	})
 }
