@@ -31,7 +31,7 @@ func Execute() {
 }
 
 func RunWire() error {
-	log.Println("🚀 Running wire to generate wire_gen.go...")
+	log.Println("⏳ ...Running wire to generate wire_gen.go...")
 
 	rootDir, err := os.Getwd()
 	if err != nil {

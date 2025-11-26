@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/binhbeng/goex/data"
 	"github.com/binhbeng/goex/internal/global"
 	"github.com/binhbeng/goex/internal/pkg/utils"
 	"gorm.io/gorm"
@@ -30,7 +29,10 @@ func NewRepository(db *gorm.DB) *Repository {
 }
 
 func (m *Repository) DB(model ...any) *gorm.DB {
-	return DB(model...)
+	if model != nil {
+		return m.db.Model(model[0])
+	}
+	return m.db
 }
 
 func (m *Repository) Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
@@ -58,11 +60,4 @@ func (m *Repository) Count(model any, condition string, args []any) (count int64
 		return 0, err
 	}
 	return
-}
-
-func DB(model ...any) *gorm.DB {
-	if model != nil {
-		return data.PostgreDB.Model(model[0])
-	}
-	return data.PostgreDB
 }

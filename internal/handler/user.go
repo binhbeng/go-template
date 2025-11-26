@@ -27,7 +27,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	data, err := h.userService.Login(loginForm.Username, loginForm.Password)
 	if err != nil {
-		api.HandleError(c, 500, "Login failed", err, nil)
+		api.HandleError(c, 500, "Login failed", err)
 		return
 	}
 
@@ -39,7 +39,7 @@ func (h *UserHandler) Me(c *gin.Context) {
 	user, err := h.userService.Me(c, userId)
 
 	if err != nil {
-		api.HandleError(c, 500, "Get profile failed", err, nil)
+		api.HandleError(c, 500, "Get profile failed", err)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	}
 
 	if err := h.userService.UpdateProfile(c, userId, &updateUserForm); err != nil {
-		api.HandleError(c, 500, "Update failed", err, nil)
+		api.HandleError(c, 500, "Update failed", err)
 		return
 	}
 

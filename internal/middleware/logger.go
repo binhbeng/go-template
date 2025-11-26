@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/binhbeng/goex/config"
 	masker "github.com/coopnorge/go-masker-lib"
 	"github.com/gin-gonic/gin"
 )
@@ -35,21 +34,21 @@ var (
 	reset   = "\033[0m"
 )
 
-func CustomLogger() gin.HandlerFunc {
+func CustomLogger(enableBodyLog bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
-		bodyReq:=""
+		bodyReq := ""
 
-		if config.Cfg.App.EnableBodyLog == true {
+		if enableBodyLog {
 			blw := &responseWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 			c.Writer = blw
 			var bodyBytes []byte
 			if c.Request.Body != nil {
 				bodyBytes, _ = io.ReadAll(c.Request.Body)
 			}
-	
+
 			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
-			bodyReq= MaskAndLogJSON(bodyBytes)
+			bodyReq = MaskAndLogJSON(bodyBytes)
 		}
 
 		c.Next()
@@ -61,8 +60,8 @@ func CustomLogger() gin.HandlerFunc {
 		ip := c.ClientIP()
 		fullPath := c.Request.URL.RequestURI()
 		errors := c.Errors.String()
-		
-		fmt.Printf("%-7s %s | %s%-3d%s | %s | %15s | %s%-7s%s %-25s | %s \n",
+
+		fmt.Printf("%-7s %s | %s%-3d%s | %10s | %15s | %s%-7s%s %-25s | %s \n",
 			"[GOEX]",
 			now,
 			colorForStatus(status), status, reset,

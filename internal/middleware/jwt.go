@@ -14,20 +14,20 @@ func JwtAuthHandler() gin.HandlerFunc {
 		authorization := c.GetHeader("Authorization")
 		accessToken, err := token.GetAccessToken(authorization)
 		if err != nil {
-			api.HandleError(c, http.StatusUnauthorized, "" , err, nil)
+			api.HandleError(c, http.StatusUnauthorized, "" , err)
 			return
 		}
 		customClaims := new(token.CustomClaims)
 
 		err = token.Parse(accessToken, customClaims, jwt.WithSubject(global.Subject))
 		if err != nil {
-			api.HandleError(c, http.StatusUnauthorized, "" , err, nil)
+			api.HandleError(c, http.StatusUnauthorized, "" , err)
 			return
 		}
 
 		exp, err := customClaims.GetExpirationTime()
 		if err != nil || exp == nil {
-			api.HandleError(c, http.StatusUnauthorized, "" , err, nil)
+			api.HandleError(c, http.StatusUnauthorized, "" , err)
 			return
 		}
 

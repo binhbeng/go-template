@@ -5,18 +5,13 @@ import (
 	"net/http"
 
 	"github.com/binhbeng/goex/config"
-	// "github.com/binhbeng/goex/wire"
-	// "github.com/binhbeng/goex/data"
 	"github.com/binhbeng/goex/internal/handler"
 	"github.com/binhbeng/goex/internal/middleware"
-
-	// "github.com/binhbeng/goex/internal/model"
-	// "github.com/binhbeng/goex/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
 type RouterDeps struct {
-    UserHandler  *handler.UserHandler
+	UserHandler *handler.UserHandler
 }
 
 func SetRouters(deps *RouterDeps) *gin.Engine {
@@ -25,17 +20,15 @@ func SetRouters(deps *RouterDeps) *gin.Engine {
 	if config.Cfg.App.AppEnv == "production" {
 		engine = ReleaseRouter()
 		engine.Use(
-		// 	middleware.RequestCostHandler(),
-		// middleware.CustomRecovery(),
+			gin.Logger(),
+			gin.Recovery(),
 		)
 	} else {
 		engine = gin.New()
 		engine.Use(
-			gin.Logger(),
-			// gin.Recovery(),
-			// middleware.CustomLogger(),
+			middleware.CustomLogger(config.Cfg.App.EnableBodyLog),
 			middleware.CustomRecovery(),
-			// middleware.CorsHandler(),
+			middleware.CorsHandler(),
 		)
 	}
 
