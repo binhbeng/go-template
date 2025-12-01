@@ -15,15 +15,18 @@ import (
 var repositorieSet = wire.NewSet(
 	model.NewRepository,
 	model.NewUserRepository,
+	model.NewOrderRepository,
 )
 
 var serviceSet= wire.NewSet(
 	service.NewUserService,
+	service.NewOrderService,
 )
 
 var handlerSet = wire.NewSet(
 	handler.NewHandler,
 	handler.NewUserHandler,
+	handler.NewOrderHandler,
 )
 
 var dataSet = wire.NewSet(
@@ -41,4 +44,14 @@ func NewWire() (*router.RouterDeps, error) {
 	)
 
 	return nil, nil
+}
+
+func NewWireGrpc() (*service.GrpcDeps, error) {
+    wire.Build(
+        dataSet,
+        repositorieSet,
+        serviceSet,
+        wire.Struct(new(service.GrpcDeps), "*"),
+    )
+    return nil, nil
 }

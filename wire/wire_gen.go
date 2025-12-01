@@ -37,12 +37,26 @@ func NewWire() (*router.RouterDeps, error) {
 	return routerDeps, nil
 }
 
+func NewWireGrpc() (*service.GrpcDeps, error) {
+	db, err := data.NewPostgreDB()
+	if err != nil {
+		return nil, err
+	}
+	repository := model.NewRepository(db)
+	orderRepository := model.NewOrderRepository(repository)
+	orderService := service.NewOrderService(orderRepository)
+	grpcDeps := &service.GrpcDeps{
+		OrderService: orderService,
+	}
+	return grpcDeps, nil
+}
+
 // wire.go:
 
-var repositorieSet = wire.NewSet(model.NewRepository, model.NewUserRepository)
+var repositorieSet = wire.NewSet(model.NewRepository, model.NewUserRepository, model.NewOrderRepository)
 
-var serviceSet = wire.NewSet(service.NewUserService)
+var serviceSet = wire.NewSet(service.NewUserService, service.NewOrderService)
 
-var handlerSet = wire.NewSet(handler.NewHandler, handler.NewUserHandler)
+var handlerSet = wire.NewSet(handler.NewHandler, handler.NewUserHandler, handler.NewOrderHandler)
 
 var dataSet = wire.NewSet(data.NewRedis, data.NewPostgreDB)

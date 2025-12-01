@@ -9,7 +9,8 @@ import (
 
 	"github.com/binhbeng/goex/cmd/crawl"
 	"github.com/binhbeng/goex/cmd/cron"
-	"github.com/binhbeng/goex/cmd/server"
+	"github.com/binhbeng/goex/cmd/grpc"
+	"github.com/binhbeng/goex/cmd/http"
 	"github.com/spf13/cobra"
 )
 
@@ -18,9 +19,11 @@ var (
 )
 
 func init() {
-	rootCmd.AddCommand(server.Cmd)
+	rootCmd.AddCommand(http_server.Cmd)
 	rootCmd.AddCommand(crawl.Cmd)
 	rootCmd.AddCommand(cron.Cmd)
+	rootCmd.AddCommand(grpc_server.Cmd)
+
 	RunWire()
 }
 

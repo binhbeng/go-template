@@ -44,3 +44,6 @@ migration-down:
 migration-status:
 	goose -dir $(MIGRATIONS_DIR) postgres $(DB_URL) status
 
+#####
+proto:
+	protoc --go_out=. --go-grpc_out=. internal/proto/*.proto

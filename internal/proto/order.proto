@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "internal/proto;proto";
+
+service OrderService {
+  rpc SayOrder (OrderRequest) returns (OrderReply);
+}
+
+message OrderRequest {
+  string name = 1;
+}
+
+message OrderReply {
+  string message = 1;
+}
