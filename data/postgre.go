@@ -27,45 +27,6 @@ func (w WriterLog) Printf(format string, args ...any) {
 	}
 }
 
-// func initPostgre() {
-// 	logConfig := logger.New(
-// 		WriterLog{},
-// 		logger.Config{
-// 			SlowThreshold:             0,
-// 			LogLevel:                  logger.LogLevel(4),
-// 			IgnoreRecordNotFoundError: false,
-// 			Colorful:                  false,
-// 		},
-// 	)
-
-// 	configs := &gorm.Config{
-// 		NamingStrategy: schema.NamingStrategy{
-// 			TablePrefix: "",
-// 		},
-// 		Logger: logConfig,
-// 	}
-
-// 	db := config.Cfg.PostgreDB
-// 	dsn := fmt.Sprintf(
-// 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-// 		db.Host, db.Username, db.Password, db.Database, db.Port,
-// 	)
-// 	var err error
-
-// 	PostgreDB, err = gorm.Open(postgres.Open(dsn), configs)
-
-// 	if err != nil {
-// 		panic("PostgreSQL connection failed：" + err.Error())
-// 	} else {
-// 		log.Println("✅ PostgreSQL connection success")
-// 	}
-
-// 	sqlDB, _ := PostgreDB.DB()
-// 	sqlDB.SetMaxIdleConns(10)
-// 	sqlDB.SetMaxOpenConns(100)
-// 	sqlDB.SetConnMaxLifetime(time.Hour)
-// }
-
 func NewPostgreDB() (*gorm.DB, error) {
 	logConfig := logger.New(
 		WriterLog{},

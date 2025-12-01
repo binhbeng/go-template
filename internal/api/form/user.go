@@ -1,6 +1,9 @@
 package form
 
-import "github.com/binhbeng/goex/internal/model"
+import (
+	"github.com/binhbeng/goex/internal/model"
+	"github.com/binhbeng/goex/internal/pkg/utils"
+)
 
 type LoginAuth struct {
 	Username string `form:"username" json:"username"  binding:"required,min=5"` 
@@ -16,6 +19,7 @@ type UserResponse struct {
 	Id       uint   `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
+	CreatedAt utils.FormatDate `json:"created_at"`
 }
 
 type UpdateUserRequest struct {

@@ -61,6 +61,7 @@ func (s *userService) Me(c *gin.Context, userId uint) (*form.UserResponse, error
 		Id:       user.ID,
 		Username: user.Username,
 		Email:    user.Email,
+		CreatedAt: user.CreatedAt,
 	}, nil
 }
 

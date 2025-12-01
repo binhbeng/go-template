@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,7 +27,7 @@ func HandleError(ctx *gin.Context, statusCode int, message string, err error) {
 		Message: message,
 		Error:   err.Error(),
 	}
-	ctx.Error(fmt.Errorf("%s",  err.Error()))
+	// ctx.Error(fmt.Errorf("%s",  err.Error()))
 	ctx.AbortWithStatusJSON(statusCode, response)
 }
 
