@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  # API server
+  server:
+    build: .
+    container_name: goex-server
+    command: ["server"]
+    ports:
+      - "9001:9001"
+
+  # Cron process
+  cron:
+    build: .
+    container_name: goex-cron
+    command: ["cron"]
+
+
