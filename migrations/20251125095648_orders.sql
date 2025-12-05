@@ -5,7 +5,7 @@ SELECT 'up SQL query';
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    produt_name VARCHAR(30) NOT NULL DEFAULT '',
+    product_name VARCHAR(30) NOT NULL DEFAULT '',
     price VARCHAR(30) DEFAULT '',
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),

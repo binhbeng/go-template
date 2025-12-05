@@ -6,9 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetUserApiRoute(e *gin.Engine ,userHandler *handler.UserHandler) {
-
-	api := e.Group("api")
+func SetUserApiRoute(api *gin.RouterGroup ,userHandler *handler.UserHandler) {
 	{
 		api.POST("login", userHandler.Login)
 		reqAuth := api.Group("", middleware.JwtAuthHandler())

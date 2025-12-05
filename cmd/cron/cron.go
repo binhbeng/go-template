@@ -1,10 +1,11 @@
 package cron
 
 import (
-	"fmt"
+	"log"
+	"time"
+
 	"github.com/robfig/cron/v3"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 var (
@@ -25,9 +26,9 @@ func Start() {
 	myLog := myLogger{}
 	crontab := cron.New(cron.WithSeconds(), cron.WithChain(cron.Recover(myLog)))
 	job := cron.NewChain(cron.SkipIfStillRunning(myLog), cron.Recover(myLog)).Then(cron.FuncJob(func() {
-		fmt.Printf("%s:%s\n", time.Now().Format("2006-01-02 15:04:05"), " cron demo")
+		log.Printf("%s:%s\n", time.Now().Format("2006-01-02 15:04:05"), " cron demo")
 	}))
-	_, err := crontab.AddJob("0/5 * * * * *", job)
+	_, err := crontab.AddJob("@every 5s", job)
 
 	if err != nil {
 		panic("Error adding job:" + err.Error())
@@ -40,9 +41,9 @@ type myLogger struct {
 }
 
 func (ml myLogger) Info(msg string, keysAndValues ...any) {
-	// log.Logger.Info(fmt.Sprintf(msg, keysAndValues...))
+	log.Printf(msg, keysAndValues...)
 }
 
 func (ml myLogger) Error(err error, msg string, keysAndValues ...any) {
-	// log.Logger.Error(err.Error() + fmt.Sprintf(msg, keysAndValues...))
+	log.Printf(msg, keysAndValues...)
 }

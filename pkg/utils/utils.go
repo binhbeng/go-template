@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-// If 模拟简单的三元操作
 func If(condition bool, trueVal, falseVal any) any {
 	if condition {
 		return trueVal
@@ -17,7 +16,6 @@ func If(condition bool, trueVal, falseVal any) any {
 	return falseVal
 }
 
-// GetRunPath 获取执行目录作为默认目录
 func GetRunPath() string {
 	currentPath, err := os.Getwd()
 	if err != nil {
@@ -26,7 +24,6 @@ func GetRunPath() string {
 	return currentPath
 }
 
-// GetFileDirectoryToCaller 根据运行堆栈信息获取文件目录，skip 默认1
 func GetFileDirectoryToCaller(opts ...int) (directory string, ok bool) {
 	var filename string
 	directory = ""
@@ -40,7 +37,6 @@ func GetFileDirectoryToCaller(opts ...int) (directory string, ok bool) {
 	return
 }
 
-// GetCurrentAbPathByExecutable 获取当前执行文件绝对路径
 func GetCurrentAbPathByExecutable() (string, error) {
 	exePath, err := os.Executable()
 	if err != nil {
@@ -50,7 +46,6 @@ func GetCurrentAbPathByExecutable() (string, error) {
 	return filepath.Dir(res), nil
 }
 
-// GetCurrentPath 获取当前执行文件路径，如果是临时目录则获取当前文件的的执行路径
 func GetCurrentPath() (dir string, err error) {
 	dir, err = GetCurrentAbPathByExecutable()
 	if err != nil {
@@ -71,7 +66,6 @@ func GetCurrentPath() (dir string, err error) {
 	return dir, nil
 }
 
-// GetDefaultPath 获取当前执行文件路径，如果是临时目录则获取运行命令的工作目录
 func GetDefaultPath() (dir string, err error) {
 	dir, err = GetCurrentAbPathByExecutable()
 	if err != nil {

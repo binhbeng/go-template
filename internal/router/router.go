@@ -8,6 +8,8 @@ import (
 	"github.com/binhbeng/goex/internal/handler"
 	"github.com/binhbeng/goex/internal/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 )
 
 type RouterDeps struct {
@@ -30,9 +32,12 @@ func SetRouters(deps *RouterDeps) *gin.Engine {
 			middleware.CustomRecovery(),
 			middleware.CorsHandler(),
 		)
+		engine.GET("/api/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	err := engine.SetTrustedProxies([]string{"127.0.0.1"})
+	api := engine.Group("/api")
+
 	if err != nil {
 		panic(err)
 	}
@@ -43,13 +48,7 @@ func SetRouters(deps *RouterDeps) *gin.Engine {
 		})
 	})
 
-	SetUserApiRoute(engine, deps.UserHandler)
-
-	engine.NoRoute(func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"message": "404 not found",
-		})
-	})
+	SetUserApiRoute(api, deps.UserHandler)
 
 	return engine
 }

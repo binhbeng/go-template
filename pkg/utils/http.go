@@ -14,7 +14,7 @@ type HttpRequest struct {
 	Error    error
 }
 
-// JsonRequest 默认 Content-Type：application/json 类型请求
+// JsonRequest Content-Type：application/json
 func (hr *HttpRequest) JsonRequest(method string, url string, body io.Reader, args ...any) *HttpRequest {
 	var options map[string]string
 	if args != nil {
@@ -30,7 +30,7 @@ func (hr *HttpRequest) JsonRequest(method string, url string, body io.Reader, ar
 	return hr.Request(method, url, body, options)
 }
 
-// GetRequest 发起 GET 请求
+// GetRequest
 func (hr *HttpRequest) GetRequest(url string, params *url.Values, args ...any) *HttpRequest {
 	r := url
 	if params != nil {

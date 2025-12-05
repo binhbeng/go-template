@@ -1,0 +1,36 @@
+definitions:
+  form.UserResponse:
+    properties:
+      created_at:
+        $ref: '#/definitions/utils.FormatDate'
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  utils.FormatDate:
+    properties:
+      time.Time:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /user/me:
+    get:
+      description: Returns User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/form.UserResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Profile
+      tags:
+      - user
+swagger: "2.0"

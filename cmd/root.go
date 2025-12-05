@@ -22,6 +22,7 @@ func init() {
 	rootCmd.AddCommand(crawl.Cmd)
 	rootCmd.AddCommand(cron.Cmd)
 	RunWire()
+	RunSwagger()
 }
 
 func Execute() {
@@ -31,7 +32,7 @@ func Execute() {
 }
 
 func RunWire() error {
-	log.Println("⏳ ...Running wire to generate wire_gen.go...")
+	// log.Println("⏳ ...Running wire to generate wire_gen.go...")
 
 	rootDir, err := os.Getwd()
 	if err != nil {
@@ -51,8 +52,8 @@ func RunWire() error {
 
 	cmd := exec.Command("wire")
 	cmd.Dir = wireDir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	// cmd.Stdout = os.Stdout
+	// cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("❌ wire generate failed: %w", err)
@@ -60,4 +61,10 @@ func RunWire() error {
 
 	log.Println("✅ Wire_go generated successfully")
 	return nil
+}
+
+func RunSwagger() error {
+	cmd := exec.Command("swag", "init")
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }

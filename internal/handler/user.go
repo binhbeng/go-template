@@ -34,6 +34,14 @@ func (h *UserHandler) Login(c *gin.Context) {
 	api.HandleSuccess(c, 200, "OK", data)
 }
 
+// Ping godoc
+// @Summary Get Profile
+// @Security BearerAuth
+// @Description Returns User
+// @Tags user
+// @Produce json
+// @Success 200 {object} form.UserResponse
+// @Router /user/me [get]
 func (h *UserHandler) Me(c *gin.Context) {
 	userId := GetUserIdFromCtx(c)
 	user, err := h.userService.Me(c, userId)
