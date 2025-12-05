@@ -70,6 +70,7 @@ require (
 )
 
 require (
+	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
 	github.com/coopnorge/go-masker-lib v0.2.0
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gin-gonic/gin v1.11.0

@@ -1,9 +1,38 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API",
+        "title": "GOEX API",
+        "contact": {},
+        "version": "1.0"
     },
+    "basePath": "/api",
     "paths": {
+        "/user": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns Status of Update",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update Profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user/me": {
             "get": {
                 "security": [
@@ -16,7 +45,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "User"
                 ],
                 "summary": "Get Profile",
                 "responses": {

@@ -4,12 +4,13 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/MarceloPetrucio/go-scalar-api-reference"
 	"github.com/binhbeng/goex/config"
 	"github.com/binhbeng/goex/internal/handler"
 	"github.com/binhbeng/goex/internal/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/files"
-	"github.com/swaggo/gin-swagger"
+	// "github.com/swaggo/files"
+	// "github.com/swaggo/gin-swagger"
 )
 
 type RouterDeps struct {
@@ -32,7 +33,24 @@ func SetRouters(deps *RouterDeps) *gin.Engine {
 			middleware.CustomRecovery(),
 			middleware.CorsHandler(),
 		)
-		engine.GET("/api/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		engine.GET("/api/docs", func(c *gin.Context) {
+			htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
+				SpecURL:       "./docs/swagger.json",
+				CustomOptions: scalar.CustomOptions{
+					PageTitle: "GOEX API",
+				},
+				DarkMode:   false,
+				IsEditable: false,
+				WithDefaultFonts: true,
+			})
+
+			if err != nil {
+				c.String(500, "failed to generate API reference: %v", err)
+				return
+			}
+
+			c.Data(200, "text/html; charset=utf-8", []byte(htmlContent))
+		})
 	}
 
 	err := engine.SetTrustedProxies([]string{"127.0.0.1"})

@@ -1,3 +1,4 @@
+basePath: /api
 definitions:
   form.UserResponse:
     properties:
@@ -17,7 +18,25 @@ definitions:
     type: object
 info:
   contact: {}
+  description: API
+  title: GOEX API
+  version: "1.0"
 paths:
+  /user:
+    patch:
+      description: Returns Status of Update
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update Profile
+      tags:
+      - User
   /user/me:
     get:
       description: Returns User
@@ -32,5 +51,5 @@ paths:
       - BearerAuth: []
       summary: Get Profile
       tags:
-      - user
+      - User
 swagger: "2.0"
