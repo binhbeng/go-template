@@ -12,7 +12,7 @@ var (
 	Cmd = &cobra.Command{
 		Use:     "cron",
 		Short:   "Starting a scheduled task",
-		Example: "go-layout cron",
+		Example: "go run main.go cron",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			// data.InitData()
 		},

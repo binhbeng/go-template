@@ -6,6 +6,7 @@ import (
 
 	"github.com/MarceloPetrucio/go-scalar-api-reference"
 	"github.com/binhbeng/goex/config"
+	"github.com/binhbeng/goex/data"
 	"github.com/binhbeng/goex/internal/handler"
 	"github.com/binhbeng/goex/internal/middleware"
 	"github.com/gin-gonic/gin"
@@ -53,6 +54,12 @@ func SetRouters(deps *RouterDeps) *gin.Engine {
 		})
 	}
 
+	if(config.Cfg.App.Socket) {
+		engine.GET("/ws", func(c *gin.Context) {
+			data.HandleWebSocket(c)
+		})
+	}
+	
 	err := engine.SetTrustedProxies([]string{"127.0.0.1"})
 	api := engine.Group("/api")
 

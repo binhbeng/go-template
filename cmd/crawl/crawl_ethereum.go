@@ -4,18 +4,14 @@ import (
 	"fmt"
 
 	"github.com/binhbeng/goex/data"
-
 	"github.com/spf13/cobra"
-	// "github.com/wannanbigpig/gin-layout/internal/routers"
-	// "github.com/wannanbigpig/gin-layout/internal/validator"
-	// "time"
 )
 
 var (
 	Cmd = &cobra.Command{
 		Use:     "crawl",
 		Short:   "Start crawler",
-		Example: "go-layout crawl -c config.yml",
+		Example: "go run main.go crawl -c config.yml",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			data.InitData()
 		},
@@ -29,9 +25,9 @@ var (
 )
 
 func init() {
-	Cmd.Flags().StringVarP(&host, "host", "H", "0.0.0.0", "监听服务器地址")
-	Cmd.Flags().IntVarP(&port, "port", "P", 9001, "监听服务器端口")
-	Cmd.Flags().BoolVarP(&setRoute, "set-route", "R", false, "设置数据库数据库API路由表")
+	Cmd.Flags().StringVarP(&host, "host", "H", "0.0.0.0", "app host")
+	Cmd.Flags().IntVarP(&port, "port", "P", 9001, "app port")
+	Cmd.Flags().BoolVarP(&setRoute, "set-route", "R", false, "set route")
 }
 
 func run() {
