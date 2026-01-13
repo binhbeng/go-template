@@ -1,37 +1,42 @@
 package handler
 
 import (
-	"github.com/binhbeng/goex/internal/api"
-	"github.com/binhbeng/goex/internal/api/form"
+	"github.com/binhbeng/goex/internal/db/sqlc"
+	"github.com/binhbeng/goex/internal/dto"
+	"github.com/binhbeng/goex/internal/pkg/utils"
+	"github.com/binhbeng/goex/internal/pkg/utils/api"
 	"github.com/binhbeng/goex/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
-	*Handler
-	userService service.UserService
+	userService *service.UserService
 }
 
-func NewUserHandler(handler *Handler, userService service.UserService) *UserHandler {
+func NewUserHandler(userService *service.UserService) *UserHandler {
 	return &UserHandler{
-		Handler:     handler,
 		userService: userService,
 	}
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
-	loginForm := new(form.LoginAuth)
+	loginForm := new(dto.LoginInput)
 	if err := api.CheckPostParams(c, &loginForm); err != nil {
 		return
 	}
 
-	data, err := h.userService.Login(loginForm.Username, loginForm.Password)
+	user, accessToken, err := h.userService.Login(loginForm.Username, loginForm.Password)
 	if err != nil {
 		api.HandleError(c, 500, "Login failed", err)
 		return
 	}
 
-	api.HandleSuccess(c, 200, "OK", data)
+	response := dto.LoginResponse{
+		User:        user,
+		AccessToken: accessToken,
+	}
+
+	api.HandleSuccess(c, 200, "OK", response)
 }
 
 // @Summary Get Profile
@@ -42,7 +47,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Success 200 {object} form.UserResponse
 // @Router /user/me [get]
 func (h *UserHandler) Me(c *gin.Context) {
-	userId := GetUserIdFromCtx(c)
+	userId := api.GetUserIdFromCtx(c)
 	user, err := h.userService.Me(c, userId)
 
 	if err != nil {
@@ -50,7 +55,14 @@ func (h *UserHandler) Me(c *gin.Context) {
 		return
 	}
 
-	api.HandleSuccess(c, 200, "OK", user)
+	response := &dto.UserResponse{
+		Id:        user.ID,
+		Username:  user.Username,
+		Email:     user.Email,
+		CreatedAt: utils.FormatDate{Time: user.CreatedAt.Time},
+	}
+
+	api.HandleSuccess(c, 200, "OK", response)
 }
 
 // @Summary Update Profile
@@ -61,13 +73,13 @@ func (h *UserHandler) Me(c *gin.Context) {
 // @Success 200 {string} string
 // @Router /user [patch]
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
-	userId := GetUserIdFromCtx(c)
-	var updateUserForm form.UpdateUserRequest
+	userId := api.GetUserIdFromCtx(c)
+	var updateUserForm dto.UpdateUserInput
 	if err := api.CheckPostParams(c, &updateUserForm); err != nil {
 		return
 	}
 
-	if err := h.userService.UpdateProfile(c, userId, &updateUserForm); err != nil {
+	if _, err := h.userService.UpdateProfile(c, userId, sqlc.UpdateUserParams{Email: updateUserForm.Email}); err != nil {
 		api.HandleError(c, 500, "Update failed", err)
 		return
 	}

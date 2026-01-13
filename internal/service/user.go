@@ -4,70 +4,67 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/binhbeng/goex/internal/api/form"
-	"github.com/binhbeng/goex/internal/model"
+	"github.com/binhbeng/goex/internal/db/sqlc"
 	"github.com/binhbeng/goex/internal/pkg/utils/token"
+	"github.com/binhbeng/goex/internal/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 )
 
-type UserService interface {
-	Login(username, password string) (*form.LoginResponse, error)
-	Me(c *gin.Context, userId uint) (*form.UserResponse, error)
-	UpdateProfile(c *gin.Context, userId uint, data *form.UpdateUserRequest) error
-}
-
-type userService struct {
-	userRepo *model.UserRepository
+type UserService struct {
+	userRepo *repository.UserRepository
 	redis    *redis.Client
 }
 
-func NewUserService(userRepo *model.UserRepository, redis *redis.Client) UserService {
-	return &userService{
+func NewUserService(
+	userRepo *repository.UserRepository,
+	redis *redis.Client,
+) *UserService {
+	return &UserService{
 		userRepo: userRepo,
 		redis:    redis,
 	}
 }
 
-func (s *userService) Login(username, password string) (*form.LoginResponse, error) {
-	var user model.User
-	if err := s.userRepo.DB().Where("username = ?", username).First(&user).Error; err != nil {
-		return nil, err
+func (s *UserService) Login(username, password string) (sqlc.User, string, error) {
+	user, err := s.userRepo.GetUserByUsername(username)
+	if err != nil {
+		return sqlc.User{}, "", err
 	}
 
 	now := time.Now()
 	expiresAt := now.Add(24 * 30 * time.Hour)
-	claim := token.NewCustomClaims(&user, expiresAt)
+	claim := token.NewCustomClaims(user, expiresAt)
 	accessToken, err := token.Generate(claim)
 
 	if err != nil {
-		return nil, err
+		return sqlc.User{}, "", err
 	}
 
-	return &form.LoginResponse{
-		User:        user,
-		AccessToken: accessToken,
-	}, nil
+	return user, accessToken, nil
 }
 
-func (s *userService) Me(c *gin.Context, userId uint) (*form.UserResponse, error) {
+func (s *UserService) Me(c *gin.Context, userId int64) (sqlc.User, error) {
 	user, err := s.userRepo.GetUserById(userId)
-
 	if err != nil {
-		return nil, err
+		return sqlc.User{}, err
 	}
 
-	return &form.UserResponse{
-		Id:       user.ID,
-		Username: user.Username,
-		Email:    user.Email,
-		CreatedAt: user.CreatedAt,
-	}, nil
+	return user, nil
 }
 
-func (s *userService) UpdateProfile(c *gin.Context, userId uint, form *form.UpdateUserRequest) error {
+func (s *UserService) UpdateProfile(c *gin.Context, userId int64, form sqlc.UpdateUserParams) (sqlc.User, error) {
 	now := time.Now()
 	s.redis.Set(c, "last_updated:"+fmt.Sprint(userId), now, 0)
 
-	return s.userRepo.DB(&model.User{}).Where("id = ?", userId).Updates(form).Error
+	updatedUser, err := s.userRepo.UpdateProfile(c, sqlc.UpdateUserParams{
+		ID:    userId,
+		Email: form.Email,
+	})
+
+	if err != nil {
+		return sqlc.User{}, err
+	}
+
+	return updatedUser, nil
 }

@@ -4,14 +4,15 @@ import (
 	"errors"
 	"strings"
 	"time"
+
 	"github.com/binhbeng/goex/config"
+	"github.com/binhbeng/goex/internal/db/sqlc"
 	"github.com/binhbeng/goex/internal/global"
-	"github.com/binhbeng/goex/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type JwtPayload struct {
-	UserID   uint   `json:"user_id"`
+	UserID   int64   `json:"user_id"`
 	Username string `json:"username"`
 }
 
@@ -67,7 +68,7 @@ type CustomClaims struct {
 	jwt.RegisteredClaims 
 }
 
-func NewCustomClaims(user *model.User, expiresAt time.Time) CustomClaims {
+func NewCustomClaims(user sqlc.User, expiresAt time.Time) CustomClaims {
 	return CustomClaims{
 		JwtPayload: JwtPayload{
 			user.ID,

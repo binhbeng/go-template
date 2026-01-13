@@ -1,9 +1,5 @@
--- +goose Up
--- +goose StatementBegin
-SELECT 'up SQL query';
--- +goose StatementEnd
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     username VARCHAR(30) NOT NULL DEFAULT '',
     password VARCHAR(255) NOT NULL DEFAULT '',
     email VARCHAR(120) NOT NULL DEFAULT '',
@@ -12,7 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
     deleted_at INT NOT NULL DEFAULT 0
 );
 
--- +goose Down
--- +goose StatementBegin
-SELECT 'down SQL query';
--- +goose StatementEnd
+-- Create comment
+COMMENT ON COLUMN users.username IS 'User name, vcl';
+
+-- Create index
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);

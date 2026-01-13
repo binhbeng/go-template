@@ -1,18 +1,20 @@
 package data
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/binhbeng/goex/config"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 )
 
-var PostgreDB *gorm.DB
+var PgxDB *pgxpool.Pool
 
 type Writer interface {
 	Printf(string, ...any)
@@ -63,4 +65,33 @@ func NewPostgreDB() (*gorm.DB, error) {
 
 	log.Println("✅ PostgreSQL connection success")
 	return db, nil
+}
+
+func NewPgxDB() (*pgxpool.Pool, error) {
+	dbCfg := config.Cfg.PostgreDB
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		dbCfg.Username, dbCfg.Password, dbCfg.Host, dbCfg.Port, dbCfg.Database,
+	)
+
+	config, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse database URL: %w", err)
+	}
+
+	config.MaxConns = 10
+	config.MinConns = 0
+	config.MaxConnLifetime = time.Hour
+
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create connection pool: %w", err)
+	}
+
+	if err := pool.Ping(context.Background()); err != nil {
+		return nil, fmt.Errorf("unable to ping database: %w", err)
+	}
+
+	log.Println("✅ Pgx connection success")
+	return pool, nil
 }

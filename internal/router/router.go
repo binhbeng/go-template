@@ -7,18 +7,13 @@ import (
 	"github.com/MarceloPetrucio/go-scalar-api-reference"
 	"github.com/binhbeng/goex/config"
 	"github.com/binhbeng/goex/data"
-	"github.com/binhbeng/goex/internal/handler"
 	"github.com/binhbeng/goex/internal/middleware"
 	"github.com/gin-gonic/gin"
 	// "github.com/swaggo/files"
 	// "github.com/swaggo/gin-swagger"
 )
 
-type RouterDeps struct {
-	UserHandler *handler.UserHandler
-}
-
-func SetRouters(deps *RouterDeps) *gin.Engine {
+func SetRouters() *gin.Engine {
 	var engine *gin.Engine
 
 	if config.Cfg.App.AppEnv == "production" {
@@ -73,7 +68,7 @@ func SetRouters(deps *RouterDeps) *gin.Engine {
 		})
 	})
 
-	SetUserApiRoute(api, deps.UserHandler)
+	SetUserApiRoute(api)
 
 	return engine
 }
