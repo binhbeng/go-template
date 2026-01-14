@@ -2,8 +2,9 @@ package middleware
 
 import (
 	"net/http"
-	"github.com/binhbeng/goex/internal/api"
+
 	"github.com/binhbeng/goex/internal/global"
+	"github.com/binhbeng/goex/internal/pkg/utils/api"
 	"github.com/binhbeng/goex/internal/pkg/utils/token"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"

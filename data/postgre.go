@@ -12,8 +12,6 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-var PostgreDB *gorm.DB
-
 type Writer interface {
 	Printf(string, ...any)
 }

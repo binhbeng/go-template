@@ -4,35 +4,38 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/binhbeng/goex/internal/api/form"
+	"github.com/binhbeng/goex/internal/dto"
 	"github.com/binhbeng/goex/internal/model"
 	"github.com/binhbeng/goex/internal/pkg/utils/token"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 )
 
-type UserService interface {
-	Login(username, password string) (*form.LoginResponse, error)
-	Me(c *gin.Context, userId uint) (*form.UserResponse, error)
-	UpdateProfile(c *gin.Context, userId uint, data *form.UpdateUserRequest) error
-}
+// type UserService interface {
+// 	Login(username, password string) (*form.LoginResponse, error)
+// 	Me(c *gin.Context, userId uint) (*form.UserResponse, error)
+// 	UpdateProfile(c *gin.Context, userId uint, data *form.UpdateUserRequest) error
+// }
 
-type userService struct {
+type UserService struct {
 	userRepo *model.UserRepository
 	redis    *redis.Client
 }
 
-func NewUserService(userRepo *model.UserRepository, redis *redis.Client) UserService {
-	return &userService{
+func NewUserService(
+	userRepo *model.UserRepository,
+	redis *redis.Client,
+) *UserService {
+	return &UserService{
 		userRepo: userRepo,
 		redis:    redis,
 	}
 }
 
-func (s *userService) Login(username, password string) (*form.LoginResponse, error) {
+func (s *UserService) Login(username, password string) (model.User, string, error) {
 	var user model.User
 	if err := s.userRepo.DB().Where("username = ?", username).First(&user).Error; err != nil {
-		return nil, err
+		return model.User{}, "", err
 	}
 
 	now := time.Now()
@@ -41,33 +44,38 @@ func (s *userService) Login(username, password string) (*form.LoginResponse, err
 	accessToken, err := token.Generate(claim)
 
 	if err != nil {
-		return nil, err
+		return model.User{}, "", err
 	}
 
-	return &form.LoginResponse{
-		User:        user,
-		AccessToken: accessToken,
-	}, nil
+	return user, accessToken, nil
 }
 
-func (s *userService) Me(c *gin.Context, userId uint) (*form.UserResponse, error) {
+func (s *UserService) Me(c *gin.Context, userId int64) (model.User, error) {
 	user, err := s.userRepo.GetUserById(userId)
 
 	if err != nil {
-		return nil, err
+		return model.User{}, err
 	}
 
-	return &form.UserResponse{
-		Id:       user.ID,
-		Username: user.Username,
-		Email:    user.Email,
-		CreatedAt: user.CreatedAt,
-	}, nil
+	return user, nil
 }
 
-func (s *userService) UpdateProfile(c *gin.Context, userId uint, form *form.UpdateUserRequest) error {
+func (s *UserService) UpdateProfile(c *gin.Context, userId int64, input dto.UpdateUserInput) (model.User, error) {
 	now := time.Now()
 	s.redis.Set(c, "last_updated:"+fmt.Sprint(userId), now, 0)
+	user, err := s.userRepo.GetUserById(userId)
 
-	return s.userRepo.DB(&model.User{}).Where("id = ?", userId).Updates(form).Error
+	if err != nil {
+		return model.User{}, err
+	}
+	
+	db := s.userRepo.DB(&model.User{})
+
+	db.Model(&user).Updates(input)
+
+	if err := db.Save(&user).Error; err != nil {
+		return model.User{}, err
+	}
+
+	return user, nil
 }
