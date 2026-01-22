@@ -39,7 +39,7 @@ func CustomLogger(enableBodyLog bool) gin.HandlerFunc {
 		start := time.Now()
 		bodyReq := ""
 
-		if enableBodyLog {
+		if enableBodyLog && c.Request.Method != "GET" {
 			blw := &responseWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 			c.Writer = blw
 			var bodyBytes []byte

@@ -1,11 +1,9 @@
 package middleware
 
 import (
-	"net/http"
-
 	"github.com/binhbeng/goex/internal/global"
-	"github.com/binhbeng/goex/internal/pkg/utils/api"
-	"github.com/binhbeng/goex/internal/pkg/utils/token"
+	"github.com/binhbeng/goex/internal/utils"
+	"github.com/binhbeng/goex/internal/utils/token"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -15,20 +13,20 @@ func JwtAuthHandler() gin.HandlerFunc {
 		authorization := c.GetHeader("Authorization")
 		accessToken, err := token.GetAccessToken(authorization)
 		if err != nil {
-			api.HandleError(c, http.StatusUnauthorized, "" , err)
+			utils.HttpUnauthorized(c, "" , err)
 			return
 		}
 		customClaims := new(token.CustomClaims)
 
 		err = token.Parse(accessToken, customClaims, jwt.WithSubject(global.Subject))
 		if err != nil {
-			api.HandleError(c, http.StatusUnauthorized, "" , err)
+			utils.HttpUnauthorized(c, "" , err)
 			return
 		}
 
 		exp, err := customClaims.GetExpirationTime()
 		if err != nil || exp == nil {
-			api.HandleError(c, http.StatusUnauthorized, "" , err)
+			utils.HttpUnauthorized(c, "" , err)
 			return
 		}
 

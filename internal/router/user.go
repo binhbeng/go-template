@@ -11,6 +11,7 @@ func SetUserApiRoute(api *gin.RouterGroup) {
 
 	{
 		api.POST("login", userHandler.Login)
+		api.GET("users", userHandler.GetListUser)
 		reqAuth := api.Group("", middleware.JwtAuthHandler())
 		{
 			userG := reqAuth.Group("user")

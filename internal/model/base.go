@@ -1,8 +1,9 @@
 package model
 
 import (
+	"github.com/binhbeng/goex/internal/dto"
 	"github.com/binhbeng/goex/internal/global"
-	"github.com/binhbeng/goex/internal/pkg/utils"
+	"github.com/binhbeng/goex/internal/utils"
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 )
@@ -35,18 +36,30 @@ func (m *Repository) DB(model ...any) *gorm.DB {
 	return m.db
 }
 
-func (m *Repository) Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
+func (m *Repository) Paginate(opt dto.PageOptionsDto) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		offset := 0
+		// limit
 		limit := global.PerPage
-		if page < 1 {
-			offset = page - 1
-		}
-		if pageSize > 0 {
-			limit = pageSize
+		if opt.Limit > 0 {
+			limit = min(opt.Limit, global.PerPage)
 		}
 
-		return db.Offset(offset * limit).Limit(limit)
+		// offset
+		offset := 0
+		if opt.Page > 1 {
+			offset = (opt.Page - 1) * limit
+		}
+
+		// order
+		if opt.OrderBy != "" {
+			order := opt.OrderBy
+			if opt.Direction != "" {
+				order += " " + opt.Direction
+			}
+			db = db.Order(order)
+		}
+
+		return db.Offset(offset).Limit(limit)
 	}
 }
 

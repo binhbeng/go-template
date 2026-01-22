@@ -1,4 +1,6 @@
-DB_URL=postgres://binhbeng:1998@localhost:5432/goapp?sslmode=disable
+include .env
+export
+
 MIGRATIONS_DIR=migrations
 
 .PHONY: migration-new migration-new-go migration-up migration-down

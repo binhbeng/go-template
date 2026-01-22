@@ -2,8 +2,9 @@ package handler
 
 import (
 	"github.com/binhbeng/goex/internal/dto"
-	"github.com/binhbeng/goex/internal/pkg/utils/api"
 	"github.com/binhbeng/goex/internal/service"
+	"github.com/binhbeng/goex/internal/utils"
+	"github.com/binhbeng/goex/internal/validation"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,14 +19,16 @@ func NewUserHandler(userService *service.UserService) *UserHandler {
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
+	ctx := c.Request.Context()
+
 	loginForm := new(dto.LoginInput)
-	if err := api.CheckPostParams(c, &loginForm); err != nil {
+	if err := validation.ValidateBodyParams(c, &loginForm); err != nil {
 		return
 	}
 
-	user, accessToken, err := h.userService.Login(loginForm.Username, loginForm.Password)
+	user, accessToken, err := h.userService.Login(ctx, loginForm.Username, loginForm.Password)
 	if err != nil {
-		api.HandleError(c, 500, "Login failed", err)
+		utils.HttpBadRequest(c, "Login failed", err)
 		return
 	}
 
@@ -33,8 +36,8 @@ func (h *UserHandler) Login(c *gin.Context) {
 		User:        dto.UserResponse{Id: user.ID, Username: user.Username, Email: user.Email, CreatedAt: user.CreatedAt},
 		AccessToken: accessToken,
 	}
-	
-	api.HandleSuccess(c, 200, "OK", response)
+
+	utils.SuccessResponse(c, 200, "OK", response)
 }
 
 // @Summary Get Profile
@@ -42,18 +45,20 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Description Returns User
 // @Tags User
 // @Produce json
-// @Success 200 {object} form.UserResponse
+// @Success 200 {object} dto.UserResponse
 // @Router /user/me [get]
 func (h *UserHandler) Me(c *gin.Context) {
-	userId := api.GetUserIdFromCtx(c)
-	user, err := h.userService.Me(c, userId)
+	ctx := c.Request.Context()
+
+	userId := c.GetInt64("user_id")
+	user, err := h.userService.Me(ctx, userId)
 
 	if err != nil {
-		api.HandleError(c, 500, "Get profile failed", err)
+		utils.HttpBadRequest(c, "Get profile failed", err)
 		return
 	}
 
-	api.HandleSuccess(c, 200, "OK", user)
+	utils.SuccessResponse(c, 200, "OK", user)
 }
 
 // @Summary Update Profile
@@ -64,17 +69,35 @@ func (h *UserHandler) Me(c *gin.Context) {
 // @Success 200 {string} string
 // @Router /user [patch]
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
-	userId := api.GetUserIdFromCtx(c)
+	ctx := c.Request.Context()
+
+	userId := c.GetInt64("user_id")
 	var updateUserForm dto.UpdateUserInput
-	if err := api.CheckPostParams(c, &updateUserForm); err != nil {
+	if err := validation.ValidateBodyParams(c, &updateUserForm); err != nil {
 		return
 	}
 
-	user, err := h.userService.UpdateProfile(c, userId, updateUserForm)
+	user, err := h.userService.UpdateProfile(ctx, userId, updateUserForm)
 	if err != nil {
-		api.HandleError(c, 500, "Update failed", err)
+		utils.HttpBadRequest(c, "Update failed", err)
 		return
 	}
 
-	api.HandleSuccess(c, 200, "OK", user)
+	utils.SuccessResponse(c, 200, "OK", user)
+}
+
+func (h *UserHandler) GetListUser(c *gin.Context) {
+	ctx := c.Request.Context()
+	var req dto.QueryUsersInput
+	if err := validation.ValidateQueryParams(c, &req); err != nil {
+		return
+	}
+
+	user, err := h.userService.GetListUser(ctx, req)
+	if err != nil {
+		utils.HttpBadRequest(c, "get failed", err)
+		return
+	}
+
+	utils.SuccessResponse(c, 200, "OK", user)
 }

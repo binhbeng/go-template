@@ -1,6 +1,6 @@
 basePath: /api
 definitions:
-  form.UserResponse:
+  dto.UserResponse:
     properties:
       created_at:
         $ref: '#/definitions/utils.FormatDate'
@@ -46,7 +46,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/form.UserResponse'
+            $ref: '#/definitions/dto.UserResponse'
       security:
       - BearerAuth: []
       summary: Get Profile

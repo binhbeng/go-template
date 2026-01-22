@@ -25,7 +25,8 @@ func SetRouters() *gin.Engine {
 	} else {
 		engine = gin.New()
 		engine.Use(
-			middleware.CustomLogger(config.Cfg.App.EnableBodyLog),
+			// middleware.CustomLogger(config.Cfg.App.EnableBodyLog),
+			gin.Logger(),
 			middleware.CustomRecovery(),
 			middleware.CorsHandler(),
 		)

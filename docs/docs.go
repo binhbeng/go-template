@@ -59,7 +59,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/form.UserResponse"
+                            "$ref": "#/definitions/dto.UserResponse"
                         }
                     }
                 }
@@ -67,7 +67,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "form.UserResponse": {
+        "dto.UserResponse": {
             "type": "object",
             "properties": {
                 "created_at": {

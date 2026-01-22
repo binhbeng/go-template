@@ -13,7 +13,7 @@ postgre:
   port: 5432
   database: goapp
   username: binhbeng
-  password: 1998
+  password: binhbengpassword
   charset: utf8mb4
   table_prefix: ""
   max_idle_conns: 10

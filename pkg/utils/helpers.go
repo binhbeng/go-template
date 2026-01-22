@@ -12,9 +12,6 @@ func MaskSensitiveInfo(s string, start int, maskNumber int, maskChars ...string)
 		start = 0
 	}
 
-	end := start + maskNumber
-	if end > len(s) {
-		end = len(s)
-	}
+	end := min(start + maskNumber, len(s))
 	return s[:start] + strings.Repeat(maskChar, end-start) + s[end:]
 }

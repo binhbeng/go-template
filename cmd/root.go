@@ -21,7 +21,6 @@ func init() {
 	rootCmd.AddCommand(server.Cmd)
 	rootCmd.AddCommand(crawl.Cmd)
 	rootCmd.AddCommand(cron.Cmd)
-	RunWire()
 	RunSwagger()
 }
 
