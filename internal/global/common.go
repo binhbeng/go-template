@@ -6,7 +6,7 @@ const (
 	Version = "0.3.0"
 	PerPage = 10
 
-	RedisPrefix = "goex:"
+	RedisPrefix           = "goex:"
 	DefaultRequestTimeout = 5 * time.Second
 
 	Issuer  = "go-ex"

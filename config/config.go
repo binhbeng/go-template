@@ -10,11 +10,11 @@ import (
 
 type Config struct {
 	App struct {
-		AppEnv   string `mapstructure:"app_env" yaml:"app_env"`
-		Debug    bool   `mapstructure:"debug" yaml:"debug"`
-		EnableBodyLog    bool   `mapstructure:"enable_body_log" yaml:"enable_body_log"`
-		Language string `mapstructure:"language" yaml:"language"`
-		Socket   bool `mapstructure:"socket" yaml:"socket"`
+		AppEnv        string `mapstructure:"app_env" yaml:"app_env"`
+		Debug         bool   `mapstructure:"debug" yaml:"debug"`
+		EnableBodyLog bool   `mapstructure:"enable_body_log" yaml:"enable_body_log"`
+		Language      string `mapstructure:"language" yaml:"language"`
+		Socket        bool   `mapstructure:"socket" yaml:"socket"`
 	} `mapstructure:"app" yaml:"app"`
 
 	Jwt struct {

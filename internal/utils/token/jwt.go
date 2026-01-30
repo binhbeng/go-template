@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 	"time"
+
 	"github.com/binhbeng/goex/config"
 	"github.com/binhbeng/goex/internal/global"
 	"github.com/binhbeng/goex/internal/model"
@@ -11,7 +12,7 @@ import (
 )
 
 type JwtPayload struct {
-	UserID   int64   `json:"user_id"`
+	UserID   int64  `json:"user_id"`
 	Username string `json:"username"`
 }
 
@@ -42,7 +43,7 @@ func Parse(accessToken string, claims jwt.Claims, options ...jwt.ParserOption) e
 		return err
 	}
 
-	if token.Valid { 
+	if token.Valid {
 		return nil
 	}
 
@@ -64,7 +65,7 @@ func GetAccessToken(authorization string) (accessToken string, err error) {
 
 type CustomClaims struct {
 	JwtPayload
-	jwt.RegisteredClaims 
+	jwt.RegisteredClaims
 }
 
 func NewCustomClaims(user *model.User, expiresAt time.Time) CustomClaims {
@@ -74,9 +75,9 @@ func NewCustomClaims(user *model.User, expiresAt time.Time) CustomClaims {
 			user.Username,
 		},
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expiresAt), 
-			Issuer:    global.Issuer,              
-			Subject: global.Subject, 
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			Issuer:    global.Issuer,
+			Subject:   global.Subject,
 		},
 	}
 }

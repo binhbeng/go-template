@@ -32,12 +32,12 @@ func SetRouters() *gin.Engine {
 		)
 		engine.GET("/api/docs", func(c *gin.Context) {
 			htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-				SpecURL:       "./docs/swagger.json",
+				SpecURL: "./docs/swagger.json",
 				CustomOptions: scalar.CustomOptions{
 					PageTitle: "GOEX API",
 				},
-				DarkMode:   false,
-				IsEditable: false,
+				DarkMode:         false,
+				IsEditable:       false,
 				WithDefaultFonts: true,
 			})
 
@@ -50,12 +50,12 @@ func SetRouters() *gin.Engine {
 		})
 	}
 
-	if(config.Cfg.App.Socket) {
+	if config.Cfg.App.Socket {
 		engine.GET("/ws", func(c *gin.Context) {
 			data.HandleWebSocket(c)
 		})
 	}
-	
+
 	err := engine.SetTrustedProxies([]string{"127.0.0.1"})
 	api := engine.Group("/api")
 
@@ -70,6 +70,7 @@ func SetRouters() *gin.Engine {
 	})
 
 	SetUserApiRoute(api)
+	SetOrderApiRoute(api)
 
 	return engine
 }
