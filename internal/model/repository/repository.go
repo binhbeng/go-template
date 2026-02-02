@@ -1,23 +1,10 @@
-package model
+package repository
 
 import (
 	"github.com/binhbeng/goex/internal/dto"
 	"github.com/binhbeng/goex/internal/global"
-	"github.com/binhbeng/goex/internal/utils"
 	"gorm.io/gorm"
-	"gorm.io/plugin/soft_delete"
 )
-
-type BaseModel struct {
-	ID        int64            `gorm:"column:id;type:int(11) unsigned AUTO_INCREMENT;not null;primarykey" json:"id"`
-	CreatedAt utils.FormatDate `gorm:"column:created_at;type:timestamp;<-:create" json:"created_at"`
-	UpdatedAt utils.FormatDate `gorm:"column:updated_at;type:timestamp" json:"updated_at"`
-}
-
-type BaseModelWithSoftDelete struct {
-	BaseModel
-	DeletedAt soft_delete.DeletedAt `gorm:"column:deleted_at;type:int(11) unsigned;not null;default:0;index;" json:"-"`
-}
 
 type Repository struct {
 	db *gorm.DB
@@ -29,9 +16,9 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-func (m *Repository) DB(model ...any) *gorm.DB {
-	if model != nil {
-		return m.db.Model(model[0])
+func (m *Repository) DB(entity ...any) *gorm.DB {
+	if entity != nil {
+		return m.db.Model(entity[0])
 	}
 	return m.db
 }
@@ -63,8 +50,8 @@ func (m *Repository) Paginate(opt dto.PageOptionsDto) func(db *gorm.DB) *gorm.DB
 	}
 }
 
-func (m *Repository) Count(model any, condition string, args []any) (count int64, err error) {
-	query := m.DB(model)
+func (m *Repository) Count(entity any, condition string, args []any) (count int64, err error) {
+	query := m.DB(entity)
 	if condition != "" {
 		query = query.Where(condition, args...)
 	}

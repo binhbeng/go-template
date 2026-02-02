@@ -8,24 +8,20 @@ import (
 
 	"github.com/binhbeng/goex/internal/dto"
 	"github.com/binhbeng/goex/internal/global"
-	"github.com/binhbeng/goex/internal/model"
+	"github.com/binhbeng/goex/internal/model/entity"
+	"github.com/binhbeng/goex/internal/model/repository"
 	"github.com/binhbeng/goex/internal/utils/token"
 	"github.com/go-redis/redis/v8"
 )
 
-// type UserService interface {
-// 	Login(ctx context.Context, username, password string) (model.User, string, error)
-// 	Me(ctx context.Context, userId int64) (model.User, error)
-// 	UpdateProfile(ctx context.Context, userId int64, input dto.UpdateUserInput) (model.User, error)
-// }
 
 type UserService struct {
-	userRepo *model.UserRepository
+	userRepo *repository.UserRepository
 	redis    *redis.Client
 }
 
 func NewUserService(
-	userRepo *model.UserRepository,
+	userRepo *repository.UserRepository,
 	redis *redis.Client,
 ) *UserService {
 	return &UserService{
@@ -34,13 +30,13 @@ func NewUserService(
 	}
 }
 
-func (s *UserService) Login(ctx context.Context, username, password string) (model.User, string, error) {
+func (s *UserService) Login(ctx context.Context, username, password string) (entity.User, string, error) {
 	ctx, cancel := context.WithTimeout(ctx, global.DefaultRequestTimeout)
 	defer cancel()
 
-	var user model.User
+	var user entity.User
 	if err := s.userRepo.DB().WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
-		return model.User{}, "", err
+		return entity.User{}, "", err
 	}
 
 	now := time.Now()
@@ -49,29 +45,29 @@ func (s *UserService) Login(ctx context.Context, username, password string) (mod
 	accessToken, err := token.Generate(claim)
 
 	if err != nil {
-		return model.User{}, "", err
+		return entity.User{}, "", err
 	}
 
 	return user, accessToken, nil
 }
 
-func (s *UserService) Me(ctx context.Context, userId int64) (model.User, error) {
+func (s *UserService) Me(ctx context.Context, userId int64) (entity.User, error) {
 	user, err := s.userRepo.GetUserById(ctx, userId)
 	if err != nil {
-		return model.User{}, err
+		return entity.User{}, err
 	}
 
 	return user, nil
 }
 
-func (s *UserService) UpdateProfile(ctx context.Context, userId int64, input dto.UpdateUserInput) (model.User, error) {
+func (s *UserService) UpdateProfile(ctx context.Context, userId int64, input dto.UpdateUserInput) (entity.User, error) {
 	user, err := s.userRepo.GetUserById(ctx, userId)
 	if err != nil {
-		return model.User{}, err
+		return entity.User{}, err
 	}
 
 	if err := s.userRepo.DB(&user).WithContext(ctx).Updates(input).Error; err != nil {
-		return model.User{}, err
+		return entity.User{}, err
 	}
 
 	go func() {
@@ -84,7 +80,7 @@ func (s *UserService) UpdateProfile(ctx context.Context, userId int64, input dto
 	return user, nil
 }
 
-func (s *UserService) GetListUser(ctx context.Context, req dto.QueryUsersInput) ([]model.User, error) {
+func (s *UserService) GetListUser(ctx context.Context, req dto.QueryUsersInput) ([]entity.User, error) {
 	data, err := s.userRepo.GetListUser(ctx, req)
 	if err != nil {
 		return nil, err

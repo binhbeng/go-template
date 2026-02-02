@@ -37,38 +37,41 @@ func run() {
 		generateModule(name)
 	case "clean":
 		fmt.Println("Maintenance:.....", name)
-		// cleanModule(name)
+		cleanModule(name)
 	default:
 		fmt.Println("Unknown command:", cmd)
 	}
 }
 
 func generateModule(name string) {
-	templates := []string{"dto.tpl", "handler.tpl", "service.tpl", "model.tpl", "module.tpl"}
+	templates := []string{"dto.tpl", "handler.tpl", "service.tpl", "entity.tpl", "repository.tpl", "module.tpl"}
+	var dstFile string
 
 	for _, tpl := range templates {
 		var dstDir string
 		switch tpl {
 		case "dto.tpl":
 			dstDir = filepath.Join("internal", "dto")
+			dstFile = name + "_dto.go"
 		case "handler.tpl":
 			dstDir = filepath.Join("internal", "handler")
+			dstFile = name + "_handler.go"
 		case "service.tpl":
 			dstDir = filepath.Join("internal", "service")
-		case "model.tpl":
-			dstDir = filepath.Join("internal", "model")
+			dstFile = name + "_service.go"
+		case "entity.tpl":
+			dstDir = filepath.Join("internal", "model", "entity")
+			dstFile = name + "_entity.go"
+		case "repository.tpl":
+			dstDir = filepath.Join("internal", "model", "repository")
+			dstFile = name + "_repository.go"
 		case "module.tpl":
 			dstDir = filepath.Join("internal", "app")
+			dstFile = name + "_module.go"
 		}
 		os.MkdirAll(dstDir, 0755)
 
 		srcPath := filepath.Join("templates/", tpl)
-		var dstFile string
-		if tpl == "module.tpl" {
-			dstFile = name + "_module.go"
-		} else {
-			dstFile = name + ".go"
-		}
 
 		dstPath := filepath.Join(dstDir, dstFile)
 
@@ -97,10 +100,11 @@ func generateModule(name string) {
 
 func cleanModule(name string) {
 	files := []string{
-		filepath.Join("internal", "dto", name+".go"),
-		filepath.Join("internal", "handler", name+".go"),
-		filepath.Join("internal", "service", name+".go"),
-		filepath.Join("internal", "model", name+".go"),
+		filepath.Join("internal", "dto", name+"_dto.go"),
+		filepath.Join("internal", "handler", name+"_handler.go"),
+		filepath.Join("internal", "service", name+"_service.go"),
+		filepath.Join("internal", "model", "entity", name+"_entity.go"),
+		filepath.Join("internal", "model", "repository", name+"_repository.go"),
 		filepath.Join("internal", "app", name+"_module.go"),
 	}
 

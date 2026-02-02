@@ -4,15 +4,15 @@ import (
 	"context"
 
 	"github.com/binhbeng/goex/internal/dto"
-	"github.com/binhbeng/goex/internal/model"
+	"github.com/binhbeng/goex/internal/model/repository"
 )
 
 type OrderService struct {
-	orderRepo *model.OrderRepository
+	orderRepo *repository.OrderRepository
 }
 
 func NewOrderService(
-	orderRepo *model.OrderRepository,
+	orderRepo *repository.OrderRepository,
 ) *OrderService {
 	return &OrderService{
 		orderRepo: orderRepo,

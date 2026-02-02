@@ -7,7 +7,7 @@ import (
 
 	"github.com/binhbeng/goex/config"
 	"github.com/binhbeng/goex/internal/global"
-	"github.com/binhbeng/goex/internal/model"
+	"github.com/binhbeng/goex/internal/model/entity"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -68,7 +68,7 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func NewCustomClaims(user *model.User, expiresAt time.Time) CustomClaims {
+func NewCustomClaims(user *entity.User, expiresAt time.Time) CustomClaims {
 	return CustomClaims{
 		JwtPayload: JwtPayload{
 			user.ID,
