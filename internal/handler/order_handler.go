@@ -25,11 +25,13 @@ func (h *OrderHandler) GetListOrder(c *gin.Context) {
 		return
 	}
 
-	user, err := h.orderService.GetListOrder(ctx, req)
+	orders, total, err := h.orderService.GetListOrders(ctx, req)
+
 	if err != nil {
 		utils.HttpBadRequest(c, "get failed", err)
 		return
 	}
-
-	utils.SuccessResponse(c, 200, "OK", user)
+	
+	paginationResp := utils.NewPagiantionResponse(orders, req.Page, req.Limit, total)
+	utils.SuccessResponse(c, 200, "OK", paginationResp)
 }

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/binhbeng/goex/internal/dto"
 )
@@ -20,17 +21,34 @@ func (m *OrderRepository) TableName() string {
 	return "orders"
 }
 
-func (m *OrderRepository) GetListOrder(ctx context.Context, filter dto.QueryOrdersInput) ([]dto.GetListOrderResponse, error) {
-	var data []dto.GetListOrderResponse
+func (m *OrderRepository) GetOrders(ctx context.Context, filter dto.QueryOrdersInput) ([]dto.GetListOrderResponse, int, error) {
+	var orderList []dto.GetListOrderResponse
+	var totalCount int64
 
-	query := m.DB().WithContext(ctx).Table("orders AS o").
+	query := m.DB().WithContext(ctx).
+		Table("orders AS o").
 		Select("o.id, o.product_name, o.price, u.id as user_id, u.username, u.email").
 		Joins("INNER JOIN users u ON o.user_id = u.id")
 
-	err := query.Scopes(m.Paginate(filter.PageOptionsDto)).Find(&data).Error
-	if err != nil {
-		return nil, err
+	allowedOrderByColumns := map[string]bool{
+		"id":         true,
+		"user_id":    true,
+		"created_at": true,
 	}
 
-	return data, nil
+	if filter.OrderBy != "" && !allowedOrderByColumns[filter.OrderBy] {
+		return nil, 0, fmt.Errorf("invalid order by column: %s", filter.OrderBy)
+	}
+
+	err := query.Count(&totalCount).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = query.Scopes(m.Paginate(filter.PageOptionsDto)).Find(&orderList).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return orderList, int(totalCount), nil
 }

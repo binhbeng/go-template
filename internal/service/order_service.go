@@ -19,11 +19,11 @@ func NewOrderService(
 	}
 }
 
-func (s *OrderService) GetListOrder(ctx context.Context, req dto.QueryOrdersInput) (any, error) {
-	data, err := s.orderRepo.GetListOrder(ctx, req)
+func (s *OrderService) GetListOrders(ctx context.Context, req dto.QueryOrdersInput) ([]dto.GetListOrderResponse, int, error) {
+	data, total, err := s.orderRepo.GetOrders(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return data, nil
+	return data, total, nil
 }

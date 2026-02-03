@@ -6,6 +6,15 @@ import (
 	"gorm.io/gorm"
 )
 
+type Pagination struct {
+	Page         int32 `json:"page"`
+	Limit        int32 `json:"limit"`
+	TotalRecords int32 `json:"total_records"`
+	TotalPages   int32 `json:"total_pages"`
+	HasNext      bool  `json:"has_next"`
+	HasPrev      bool  `json:"has_prev"`
+}
+
 type Repository struct {
 	db *gorm.DB
 }

@@ -9,10 +9,11 @@ import (
 )
 
 type Response struct {
-	Status  bool   `json:"success"`
-	Message string `json:"message"`
-	Error   any    `json:"error,omitempty"`
-	Data    any    `json:"data,omitempty"`
+	Status     bool   `json:"success"`
+	Message    string `json:"message"`
+	Error      any    `json:"error,omitempty"`
+	Data       any    `json:"data,omitempty"`
+	Pagination any    `json:"pagination,omitempty"`
 }
 
 func SuccessResponse(ctx *gin.Context, statusCode int, message string, data ...any) {
@@ -25,9 +26,9 @@ func SuccessResponse(ctx *gin.Context, statusCode int, message string, data ...a
 
 	if len(data) > 0 && data[0] != nil {
 		if m, ok := data[0].(map[string]any); ok {
-			// if p, exists := m["pagination"]; exists {
-			// 	response.Pagination = p
-			// }
+			if p, exists := m["pagination"]; exists {
+				response.Pagination = p
+			}
 
 			if d, exists := m["data"]; exists {
 				response.Data = d
