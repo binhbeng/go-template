@@ -1,13 +1,17 @@
 package entity
 
 import (
+	"github.com/binhbeng/goex/internal/utils/timeutil"
 	"gorm.io/plugin/soft_delete"
 )
 
 type User struct {
-	BaseEntity
-	DeletedAt soft_delete.DeletedAt `gorm:"column:deleted_at;type:int(11) unsigned;not null;default:0;index;" json:"-"`
+	ID        int                   `gorm:"column:id;type:int(11) unsigned AUTO_INCREMENT;not null;primarykey" json:"id"`
 	Username  string                `json:"username"`
 	Password  string                `json:"-"`
 	Email     string                `json:"email"`
+	Balance   string                `json:"balance"`
+	CreatedAt timeutil.FormatDate   `gorm:"column:created_at;type:timestamp;<-:create" json:"created_at"`
+	UpdatedAt timeutil.FormatDate   `gorm:"column:updated_at;type:timestamp" json:"updated_at"`
+	DeletedAt soft_delete.DeletedAt `gorm:"column:deleted_at;type:int(11) unsigned;not null;default:0;index;" json:"-"`
 }

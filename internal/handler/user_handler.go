@@ -50,7 +50,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 func (h *UserHandler) Me(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	userId := c.GetInt64("user_id")
+	userId := c.GetInt("user_id")
 	user, err := h.userService.Me(ctx, userId)
 
 	if err != nil {
@@ -71,7 +71,7 @@ func (h *UserHandler) Me(c *gin.Context) {
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	userId := c.GetInt64("user_id")
+	userId := c.GetInt("user_id")
 	var updateUserForm dto.UpdateUserInput
 	if err := validation.ValidateBodyParams(c, &updateUserForm); err != nil {
 		return

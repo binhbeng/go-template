@@ -31,7 +31,24 @@ func (h *OrderHandler) GetListOrder(c *gin.Context) {
 		utils.HttpBadRequest(c, "get failed", err)
 		return
 	}
-	
+
 	paginationResp := utils.NewPagiantionResponse(orders, req.Page, req.Limit, total)
 	utils.SuccessResponse(c, 200, "OK", paginationResp)
+}
+
+func (h *OrderHandler) CreateOrder(c *gin.Context) {
+	ctx := c.Request.Context()
+	userId := 3
+	var data dto.CreateOrderInput
+	if err := validation.ValidateBodyParams(c, &data); err != nil {
+		return
+	}
+
+	order, err := h.orderService.CreateOrder(ctx, userId, data)
+	if err != nil {
+		utils.HttpBadRequest(c, "create failed", err)
+		return
+	}
+
+	utils.SuccessResponse(c, 200, "OK", order)
 }

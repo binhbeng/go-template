@@ -5,15 +5,24 @@ import (
 	"fmt"
 
 	"github.com/binhbeng/goex/internal/dto"
+	"github.com/binhbeng/goex/internal/model/entity"
+	"github.com/binhbeng/goex/internal/utils"
+	"gorm.io/gorm"
 )
 
 type OrderRepository struct {
-	*Repository
+	DB *gorm.DB
 }
 
-func NewOrderRepository(r *Repository) *OrderRepository {
+func NewOrderRepository(db *gorm.DB) *OrderRepository {
 	return &OrderRepository{
-		Repository: r,
+		DB: db,
+	}
+}
+
+func (m *OrderRepository) WithTx(tx *gorm.DB) *OrderRepository {
+	return &OrderRepository{
+		DB: tx,
 	}
 }
 
@@ -25,7 +34,7 @@ func (m *OrderRepository) GetOrders(ctx context.Context, filter dto.QueryOrdersI
 	var orderList []dto.GetListOrderResponse
 	var totalCount int64
 
-	query := m.DB().WithContext(ctx).
+	query := m.DB.WithContext(ctx).
 		Table("orders AS o").
 		Select("o.id, o.product_name, o.price, u.id as user_id, u.username, u.email").
 		Joins("INNER JOIN users u ON o.user_id = u.id")
@@ -45,10 +54,17 @@ func (m *OrderRepository) GetOrders(ctx context.Context, filter dto.QueryOrdersI
 		return nil, 0, err
 	}
 
-	err = query.Scopes(m.Paginate(filter.PageOptionsDto)).Find(&orderList).Error
+	err = query.Scopes(utils.Paginate(filter.PageOptionsDto)).Find(&orderList).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
 	return orderList, int(totalCount), nil
+}
+
+func (m *OrderRepository) CreateOrder(ctx context.Context, order entity.Order) (entity.Order, error) {
+	if err := m.DB.WithContext(ctx).Create(&order).Error; err != nil {
+		return entity.Order{}, err
+	}
+	return order, nil
 }

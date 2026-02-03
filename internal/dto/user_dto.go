@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/binhbeng/goex/internal/utils"
+	"github.com/binhbeng/goex/internal/utils/timeutil"
 )
 
 type LoginInput struct {
@@ -10,10 +10,10 @@ type LoginInput struct {
 }
 
 type UserResponse struct {
-	Id        int64            `json:"id"`
-	Username  string           `json:"username"`
-	Email     string           `json:"email"`
-	CreatedAt utils.FormatDate `json:"created_at"`
+	Id        int                 `json:"id"`
+	Username  string              `json:"username"`
+	Email     string              `json:"email"`
+	CreatedAt timeutil.FormatDate `json:"created_at"`
 }
 
 type LoginResponse struct {

@@ -12,13 +12,13 @@ type OrderModule struct {
 }
 
 func NewOrderModule() *OrderModule {
-	baseRepo := repository.NewRepository(data.PostgreDB)
-	orderRepository := repository.NewOrderRepository(baseRepo)
-	orderService := service.NewOrderService(orderRepository)
+	orderRepository := repository.NewOrderRepository(data.PostgreDB)
+	userRepository := repository.NewUserRepository(data.PostgreDB)
+	orderService := service.NewOrderService(orderRepository, userRepository)
 	orderHandler := handler.NewOrderHandler(orderService)
 	return &OrderModule{
-        orderHandler: orderHandler,
-    }
+		orderHandler: orderHandler,
+	}
 }
 
 func (m *OrderModule) Handler() *handler.OrderHandler {

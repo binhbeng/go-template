@@ -12,8 +12,7 @@ type UserModule struct {
 }
 
 func NewUserModule() *UserModule {
-	baseRepo := repository.NewRepository(data.PostgreDB)
-	userRepository := repository.NewUserRepository(baseRepo)
+	userRepository := repository.NewUserRepository(data.PostgreDB)
 	userService := service.NewUserService(userRepository, data.RedisDB)
 	userHandler := handler.NewUserHandler(userService)
 	return &UserModule{userHandler: userHandler}

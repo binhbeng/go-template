@@ -1,5 +1,12 @@
 package utils
 
+import (
+	"github.com/binhbeng/goex/data"
+	"github.com/binhbeng/goex/internal/dto"
+	"github.com/binhbeng/goex/internal/global"
+	"gorm.io/gorm"
+)
+
 type Pagination struct {
 	Page         int  `json:"page"`
 	Limit        int  `json:"limit"`
@@ -30,5 +37,37 @@ func NewPagiantionResponse(data any, page, limit, totalRecords int) map[string]a
 	return map[string]any{
 		"data":       data,
 		"pagination": NewPagiantion(page, limit, totalRecords),
+	}
+}
+
+func DB() *gorm.DB {
+	return data.PostgreDB
+}
+
+func Paginate(opt dto.PageOptionsDto) func(db *gorm.DB) *gorm.DB {
+
+	return func(db *gorm.DB) *gorm.DB {
+		// limit
+		limit := global.PerPage
+		if opt.Limit > 0 {
+			limit = min(opt.Limit, global.PerPage)
+		}
+
+		// offset
+		offset := 0
+		if opt.Page > 1 {
+			offset = (opt.Page - 1) * limit
+		}
+
+		// order
+		if opt.OrderBy != "" {
+			order := opt.OrderBy
+			if opt.Direction != "" {
+				order += " " + opt.Direction
+			}
+			db = db.Order(order)
+		}
+
+		return db.Offset(offset).Limit(limit)
 	}
 }

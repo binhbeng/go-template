@@ -9,5 +9,6 @@ func SetOrderApiRoute(api *gin.RouterGroup) {
 	orderHandler := app.NewOrderModule().Handler()
 	{
 		api.GET("orders", orderHandler.GetListOrder)
+		api.POST("order", orderHandler.CreateOrder)
 	}
 }

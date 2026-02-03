@@ -35,7 +35,7 @@ func (s *UserService) Login(ctx context.Context, username, password string) (ent
 	defer cancel()
 
 	var user entity.User
-	if err := s.userRepo.DB().WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
+	if err := s.userRepo.DB.WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
 		return entity.User{}, "", err
 	}
 
@@ -51,7 +51,7 @@ func (s *UserService) Login(ctx context.Context, username, password string) (ent
 	return user, accessToken, nil
 }
 
-func (s *UserService) Me(ctx context.Context, userId int64) (entity.User, error) {
+func (s *UserService) Me(ctx context.Context, userId int) (entity.User, error) {
 	user, err := s.userRepo.GetUserById(ctx, userId)
 	if err != nil {
 		return entity.User{}, err
@@ -60,13 +60,13 @@ func (s *UserService) Me(ctx context.Context, userId int64) (entity.User, error)
 	return user, nil
 }
 
-func (s *UserService) UpdateProfile(ctx context.Context, userId int64, input dto.UpdateUserInput) (entity.User, error) {
+func (s *UserService) UpdateProfile(ctx context.Context, userId int, input dto.UpdateUserInput) (entity.User, error) {
 	user, err := s.userRepo.GetUserById(ctx, userId)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	if err := s.userRepo.DB(&user).WithContext(ctx).Updates(input).Error; err != nil {
+	if err := s.userRepo.DB.WithContext(ctx).Updates(input).Error; err != nil {
 		return entity.User{}, err
 	}
 

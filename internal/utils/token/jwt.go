@@ -12,7 +12,7 @@ import (
 )
 
 type JwtPayload struct {
-	UserID   int64  `json:"user_id"`
+	UserID   int    `json:"user_id"`
 	Username string `json:"username"`
 }
 
