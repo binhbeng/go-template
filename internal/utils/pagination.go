@@ -45,7 +45,6 @@ func DB() *gorm.DB {
 }
 
 func Paginate(opt dto.PageOptionsDto) func(db *gorm.DB) *gorm.DB {
-
 	return func(db *gorm.DB) *gorm.DB {
 		// limit
 		limit := global.PerPage

@@ -1,16 +1,14 @@
 package entity
 
 import (
-	"github.com/binhbeng/goex/internal/utils/timeutil"
 	"gorm.io/plugin/soft_delete"
+	"github.com/binhbeng/goex/internal/utils/timeutil"
 )
 
-type Order struct {
+type Product struct {
 	ID        int                   `gorm:"column:id;type:int(11) unsigned AUTO_INCREMENT;not null;primarykey" json:"id"`
-	UserID    int                   `json:"user_id"`
-	ProductID int                   `json:"product_id"`
+	Name      string                `json:"name"`
 	Price     string                `json:"price"`
-	Quantity  int                   `json:"quantity"`
 	CreatedAt timeutil.FormatDate   `gorm:"column:created_at;type:timestamp;<-:create" json:"created_at"`
 	UpdatedAt timeutil.FormatDate   `gorm:"column:updated_at;type:timestamp" json:"updated_at"`
 	DeletedAt soft_delete.DeletedAt `gorm:"column:deleted_at;type:int(11) unsigned;not null;default:0;index;" json:"-"`

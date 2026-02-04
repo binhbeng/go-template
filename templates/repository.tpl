@@ -1,12 +1,22 @@
 package repository
 
+import (
+	"gorm.io/gorm"
+)
+
 type {{.Pascal}}Repository struct {
-	*Repository
+	DB *gorm.DB
 }
 
-func New{{.Pascal}}Repository(r *Repository) *{{.Pascal}}Repository {
+func New{{.Pascal}}Repository(db *gorm.DB) *{{.Pascal}}Repository {
 	return &{{.Pascal}}Repository{
-		Repository: r,
+		DB: db,
+	}
+}
+
+func (m *{{.Pascal}}Repository) WithTx(tx *gorm.DB) *{{.Pascal}}Repository {
+	return &{{.Pascal}}Repository{
+		DB: tx,
 	}
 }
 

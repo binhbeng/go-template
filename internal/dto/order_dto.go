@@ -10,15 +10,18 @@ type QueryOrdersInput struct {
 }
 
 type GetListOrderResponse struct {
-	ID          int   `json:"id"`
-	ProductName string `json:"product_name"`
-	Price       string `json:"price"`
-	UserID      int   `json:"user_id"`
+	ID          int    `json:"id"`
+	UserID      int    `json:"user_id"`
 	Username    string `json:"username"`
 	Email       string `json:"email"`
+	ProductID   int    `json:"product_id"`
+	ProductName string `json:"product_name"`
+	Price       string `json:"price"`
+	Quantity    int    `json:"quantity"`
 }
 
 type CreateOrderInput struct {
-	ProductName string `json:"product_name"`
-	Price       string `json:"price"`
+	ProductID int    `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+	Price     string `json:"price"`
 }

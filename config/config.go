@@ -3,69 +3,69 @@ package config
 import (
 	"log"
 	"os"
-	"path/filepath"
+	"sync"
 
-	"github.com/spf13/viper"
+	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
+)
+
+var (
+	Cfg  *Config
+	once sync.Once
 )
 
 type Config struct {
 	App struct {
-		AppEnv        string `mapstructure:"app_env" yaml:"app_env"`
-		Debug         bool   `mapstructure:"debug" yaml:"debug"`
-		EnableBodyLog bool   `mapstructure:"enable_body_log" yaml:"enable_body_log"`
-		Language      string `mapstructure:"language" yaml:"language"`
-		Socket        bool   `mapstructure:"socket" yaml:"socket"`
-	} `mapstructure:"app" yaml:"app"`
+		AppEnv        string `env:"APP_ENV"`
+		Debug         bool   `env:"DEBUG"`
+		EnableBodyLog bool   `env:"ENABLE_BODY_LOG"`
+		Language      string `env:"LANGUAGE"`
+		Socket        bool   `env:"SOCKET"`
+	}
 
 	Jwt struct {
-		TTL        int    `mapstructure:"ttl" yaml:"ttl"`
-		RefreshTTL int    `mapstructure:"refresh_ttl" yaml:"refresh_ttl"`
-		SecretKey  string `mapstructure:"secret_key" yaml:"secret_key"`
-	} `mapstructure:"jwt" yaml:"jwt"`
+		TTL        int    `env:"JWT_TTL"`
+		RefreshTTL int    `env:"JWT_REFRESH_TTL"`
+		SecretKey  string `env:"JWT_SECRET_KEY"`
+	}
 
 	PostgreDB struct {
-		Enable       bool   `mapstructure:"enable" yaml:"enable"`
-		Host         string `mapstructure:"host" yaml:"host"`
-		Port         int    `mapstructure:"port" yaml:"port"`
-		Database     string `mapstructure:"database" yaml:"database"`
-		Username     string `mapstructure:"username" yaml:"username"`
-		Password     string `mapstructure:"password" yaml:"password"`
-		Charset      string `mapstructure:"charset" yaml:"charset"`
-		TablePrefix  string `mapstructure:"table_prefix" yaml:"table_prefix"`
-		MaxIdleConns int    `mapstructure:"max_idle_conns" yaml:"max_idle_conns"`
-		MaxOpenConns int    `mapstructure:"max_open_conns" yaml:"max_open_conns"`
-		MaxLifetime  string `mapstructure:"max_lifetime" yaml:"max_lifetime"`
-		PrintSql     bool   `mapstructure:"print_sql" yaml:"print_sql"`
-	} `mapstructure:"postgre" yaml:"postgre"`
+		Enable       bool   `env:"POSTGRE_ENABLE"`
+		Host         string `env:"POSTGRE_HOST"`
+		Port         int    `env:"POSTGRE_PORT"`
+		Database     string `env:"POSTGRE_DATABASE"`
+		Username     string `env:"POSTGRE_USERNAME"`
+		Password     string `env:"POSTGRE_PASSWORD"`
+		Charset      string `env:"POSTGRE_CHARSET"`
+		TablePrefix  string `env:"POSTGRE_TABLE_PREFIX"`
+		MaxIdleConns int    `env:"POSTGRE_MAX_IDLE_CONNS"`
+		MaxOpenConns int    `env:"POSTGRE_MAX_OPEN_CONNS"`
+		MaxLifetime  string `env:"POSTGRE_MAX_LIFETIME"`
+		PrintSql     bool   `env:"POSTGRE_PRINT_SQL"`
+	}
 
 	Redis struct {
-		Enable   bool   `mapstructure:"enable" yaml:"enable"`
-		Host     string `mapstructure:"host" yaml:"host"`
-		Port     int    `mapstructure:"port" yaml:"port"`
-		Password string `mapstructure:"password" yaml:"password"`
-		Database int    `mapstructure:"database" yaml:"database"`
-	} `mapstructure:"redis" yaml:"redis"`
+		Enable   bool   `env:"REDIS_ENABLE"`
+		Host     string `env:"REDIS_HOST"`
+		Port     int    `env:"REDIS_PORT"`
+		Password string `env:"REDIS_PASSWORD"`
+		Database int    `env:"REDIS_DATABASE"`
+	}
 }
 
-var Cfg *Config
+func Load() {
+	once.Do(func() {
+		environment := os.Getenv("APP_ENV")
+		if environment == "local" || environment == "dev" || environment == "" {
+			_ = godotenv.Load()
+		}
 
-func init() {
-	v := viper.New()
-	dir, _ := os.Getwd()
+		var c Config
+		if err := env.Parse(&c); err != nil {
+			log.Fatalf("❌ Load config failed: %v", err)
+		}
 
-	cfgPath := filepath.Join(dir, "config", "config.yml")
-	v.SetConfigFile(cfgPath)
-	v.AutomaticEnv()
-
-	if err := v.ReadInConfig(); err != nil {
-		log.Fatalf("❌ Error reading config file: %v", err)
-	}
-
-	var cfg Config
-	if err := v.Unmarshal(&cfg); err != nil {
-		log.Fatalf("❌ Unable to decode config: %v", err)
-	}
-
-	Cfg = &cfg
-	log.Println("✅ Config loaded successfully.")
+		Cfg = &c
+		log.Println("✅ Config loaded successfully.")
+	})
 }

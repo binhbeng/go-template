@@ -6,6 +6,7 @@ import (
 	"github.com/binhbeng/goex/internal/dto"
 	"github.com/binhbeng/goex/internal/model/entity"
 	"github.com/binhbeng/goex/internal/model/repository"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -41,9 +42,10 @@ func (s *OrderService) CreateOrder(ctx context.Context, userID int, input dto.Cr
 		userRepoTx := s.userRepo.WithTx(tx)
 
 		order := entity.Order{
-			ProductName: input.ProductName,
-			Price:       input.Price,
-			UserID:      userID,
+			UserID:    userID,
+			ProductID: input.ProductID,
+			Quantity:  input.Quantity,
+			Price:     input.Price,
 		}
 
 		order, err := orderRepoTx.CreateOrder(ctx, order)
@@ -52,15 +54,10 @@ func (s *OrderService) CreateOrder(ctx context.Context, userID int, input dto.Cr
 		}
 
 		createdOrder = order
+		totalAmount := decimal.RequireFromString(input.Price).Mul(decimal.NewFromInt(int64(input.Quantity))).String()
 
-		user, err := userRepoTx.GetUserById(ctx, userID)
+		_, err = userRepoTx.AddBalance(ctx, userID, totalAmount)
 		if err != nil {
-			return err
-		}
-
-		user.Balance += input.Price
-		
-		if err := userRepoTx.DB.WithContext(ctx).Save(&user).Error; err != nil {
 			return err
 		}
 

@@ -18,7 +18,7 @@ func JwtAuthHandler() gin.HandlerFunc {
 		}
 		customClaims := new(token.CustomClaims)
 
-		err = token.Parse(accessToken, customClaims, jwt.WithSubject(global.Subject))
+		err = token.Parse(accessToken, customClaims, jwt.WithIssuer(global.Issuer))
 		if err != nil {
 			utils.HttpUnauthorized(c, "", err)
 			return

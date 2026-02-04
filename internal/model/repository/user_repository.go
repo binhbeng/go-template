@@ -2,11 +2,14 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/binhbeng/goex/internal/dto"
 	"github.com/binhbeng/goex/internal/model/entity"
 	"github.com/binhbeng/goex/internal/utils"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type UserRepository struct {
@@ -55,4 +58,36 @@ func (m *UserRepository) GetListUser(ctx context.Context, filter dto.QueryUsersI
 	}
 
 	return users, nil
+}
+
+func (m *UserRepository) AddBalance(ctx context.Context, userID int, amount string) (string, error) {
+	var user entity.User
+	if err := m.DB.WithContext(ctx).
+		Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("id = ?", userID).
+		First(&user).Error; err != nil {
+		return "", err
+	}
+
+	amountDec, err := decimal.NewFromString(amount)
+	if err != nil {
+		return "", fmt.Errorf("invalid amount format: %w", err)
+	}
+
+	currentBalanceDec, err := decimal.NewFromString(user.Balance)
+	if err != nil {
+		return "", fmt.Errorf("invalid current balance format: %w", err)
+	}
+
+	newBalanceDec := currentBalanceDec.Add(amountDec)
+	newBalanceStr := newBalanceDec.String()
+
+	err = m.DB.WithContext(ctx).Model(&user).
+		Where("id = ?", userID).
+		Update("balance", newBalanceStr).Error
+	if err != nil {
+		return "", err
+	}
+
+	return newBalanceStr, nil
 }

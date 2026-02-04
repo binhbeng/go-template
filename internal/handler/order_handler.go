@@ -38,7 +38,7 @@ func (h *OrderHandler) GetListOrder(c *gin.Context) {
 
 func (h *OrderHandler) CreateOrder(c *gin.Context) {
 	ctx := c.Request.Context()
-	userId := 3
+	userId := 1
 	var data dto.CreateOrderInput
 	if err := validation.ValidateBodyParams(c, &data); err != nil {
 		return

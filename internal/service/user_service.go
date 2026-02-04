@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/binhbeng/goex/config"
 	"github.com/binhbeng/goex/internal/dto"
 	"github.com/binhbeng/goex/internal/global"
 	"github.com/binhbeng/goex/internal/model/entity"
@@ -40,7 +41,7 @@ func (s *UserService) Login(ctx context.Context, username, password string) (ent
 	}
 
 	now := time.Now()
-	expiresAt := now.Add(24 * 30 * time.Hour)
+	expiresAt := now.Add(time.Duration(config.Cfg.Jwt.TTL) * time.Second)
 	claim := token.NewCustomClaims(&user, expiresAt)
 	accessToken, err := token.Generate(claim)
 

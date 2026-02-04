@@ -77,7 +77,6 @@ func NewCustomClaims(user *entity.User, expiresAt time.Time) CustomClaims {
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			Issuer:    global.Issuer,
-			Subject:   global.Subject,
 		},
 	}
 }

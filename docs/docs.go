@@ -71,7 +71,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
-                    "$ref": "#/definitions/utils.FormatDate"
+                    "$ref": "#/definitions/timeutil.FormatDate"
                 },
                 "email": {
                     "type": "string"
@@ -84,7 +84,7 @@ const docTemplate = `{
                 }
             }
         },
-        "utils.FormatDate": {
+        "timeutil.FormatDate": {
             "type": "object",
             "properties": {
                 "time.Time": {

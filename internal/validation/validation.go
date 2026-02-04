@@ -60,6 +60,7 @@ func ValidateBodyParams(c *gin.Context, obj any) error {
 	if err := c.ShouldBind(obj); err != nil {
 		errs := HandleValidationErrors(err)
 		utils.HttpBadRequest(c, "Invalid body request", errs)
+		return err
 	}
 
 	return nil

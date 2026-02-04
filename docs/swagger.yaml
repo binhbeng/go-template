@@ -3,7 +3,7 @@ definitions:
   dto.UserResponse:
     properties:
       created_at:
-        $ref: '#/definitions/utils.FormatDate'
+        $ref: '#/definitions/timeutil.FormatDate'
       email:
         type: string
       id:
@@ -11,7 +11,7 @@ definitions:
       username:
         type: string
     type: object
-  utils.FormatDate:
+  timeutil.FormatDate:
     properties:
       time.Time:
         type: string

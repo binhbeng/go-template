@@ -10,5 +10,4 @@ const (
 	DefaultRequestTimeout = 5 * time.Second
 
 	Issuer  = "go-ex"
-	Subject = "pc-admin"
 )

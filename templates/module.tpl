@@ -12,8 +12,7 @@ type {{.Pascal}}Module struct {
 }
 
 func New{{.Pascal}}Module() *{{.Pascal}}Module {
-	baseRepo := repository.NewRepository(data.PostgreDB)
-	{{.Name}}Repository := repository.New{{.Pascal}}Repository(baseRepo)
+	{{.Name}}Repository := repository.New{{.Pascal}}Repository(data.PostgreDB)
 	{{.Name}}Service := service.New{{.Pascal}}Service({{.Name}}Repository)
 	{{.Name}}Handler := handler.New{{.Pascal}}Handler({{.Name}}Service)
 	return &{{.Pascal}}Module{
