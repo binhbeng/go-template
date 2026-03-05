@@ -3,9 +3,7 @@ package server
 import (
 	"fmt"
 
-	"github.com/binhbeng/goex/config"
-	"github.com/binhbeng/goex/data"
-	"github.com/binhbeng/goex/internal/router"
+	"github.com/binhbeng/goex/internal/app"
 	"github.com/spf13/cobra"
 )
 
@@ -31,9 +29,7 @@ func init() {
 }
 
 func run() error {
-	config.Load()
-	data.InitData()
-	engine := router.SetRouters()
+	engine := app.NewApp().Engine
 
 	err := engine.Run(fmt.Sprintf("%s:%d", host, port))
 	if err != nil {

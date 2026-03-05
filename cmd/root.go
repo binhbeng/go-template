@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/binhbeng/goex/cmd/crawl"
+	"github.com/binhbeng/goex/cmd/worker"
 	"github.com/binhbeng/goex/cmd/cron"
 	"github.com/binhbeng/goex/cmd/server"
 	"github.com/spf13/cobra"
@@ -19,7 +19,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(server.Cmd)
-	rootCmd.AddCommand(crawl.Cmd)
+	rootCmd.AddCommand(worker.Cmd)
 	rootCmd.AddCommand(cron.Cmd)
 	RunSwagger()
 }

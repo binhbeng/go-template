@@ -5,22 +5,31 @@ import (
 	"github.com/binhbeng/goex/internal/handler"
 	"github.com/binhbeng/goex/internal/model/repository"
 	"github.com/binhbeng/goex/internal/service"
+	"github.com/binhbeng/goex/pkg/kafka"
 )
 
 type OrderModule struct {
 	orderHandler *handler.OrderHandler
+	orderService *service.OrderService
 }
 
-func NewOrderModule() *OrderModule {
+func NewOrderModule(kafkaProducer kafka.KafkaProducer) *OrderModule {
 	orderRepository := repository.NewOrderRepository(data.PostgreDB)
 	userRepository := repository.NewUserRepository(data.PostgreDB)
+
 	orderService := service.NewOrderService(orderRepository, userRepository)
-	orderHandler := handler.NewOrderHandler(orderService)
+	orderHandler := handler.NewOrderHandler(orderService, kafkaProducer)
+
 	return &OrderModule{
 		orderHandler: orderHandler,
+		orderService: orderService,
 	}
 }
 
-func (m *OrderModule) Handler() *handler.OrderHandler {
-	return m.orderHandler
+func (o *OrderModule) Handler() *handler.OrderHandler {
+	return o.orderHandler
+}
+
+func (o *OrderModule) Service() *service.OrderService {
+	return o.orderService
 }

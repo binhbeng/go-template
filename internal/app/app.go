@@ -1,4 +1,4 @@
-package router
+package app
 
 import (
 	"io"
@@ -7,17 +7,43 @@ import (
 	"github.com/MarceloPetrucio/go-scalar-api-reference"
 	"github.com/binhbeng/goex/config"
 	"github.com/binhbeng/goex/data"
+	"github.com/binhbeng/goex/internal/handler"
 	"github.com/binhbeng/goex/internal/middleware"
+	"github.com/binhbeng/goex/internal/router"
+	"github.com/binhbeng/goex/pkg/kafka"
 	"github.com/gin-gonic/gin"
-	// "github.com/swaggo/files"
-	// "github.com/swaggo/gin-swagger"
 )
 
-func SetRouters() *gin.Engine {
+type App struct {
+	Engine        *gin.Engine
+	OrderHandler  *handler.OrderHandler
+	UserHandler   *handler.UserHandler
+}
+
+func NewApp() *App {
+	config.Load()
+	data.InitData()
+	
+	kafkaProducer := kafka.NewKafkaProducer([]string{"localhost:9092"})
+
+	orderModule := NewOrderModule(kafkaProducer)
+	userModule := NewUserModule()
+
+	app := &App{
+		OrderHandler:  orderModule.Handler(),
+		UserHandler:   userModule.Handler(),
+	}
+
+	app.setupRouter()
+
+	return app
+}
+
+func (a *App) setupRouter() {
 	var engine *gin.Engine
 
 	if config.Cfg.App.AppEnv == "production" {
-		engine = ReleaseRouter()
+		engine = a.releaseRouter()
 		engine.Use(
 			gin.Logger(),
 			gin.Recovery(),
@@ -25,11 +51,11 @@ func SetRouters() *gin.Engine {
 	} else {
 		engine = gin.New()
 		engine.Use(
-			// middleware.CustomLogger(config.Cfg.App.EnableBodyLog),
 			gin.Logger(),
 			middleware.CustomRecovery(),
 			middleware.CorsHandler(),
 		)
+
 		engine.GET("/api/docs", func(c *gin.Context) {
 			htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
 				SpecURL: "./docs/swagger.json",
@@ -57,29 +83,25 @@ func SetRouters() *gin.Engine {
 	}
 
 	err := engine.SetTrustedProxies([]string{"127.0.0.1"})
-	api := engine.Group("/api")
-
 	if err != nil {
 		panic(err)
 	}
 
 	engine.GET("/ping", func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "pong!",
 		})
 	})
 
-	SetUserApiRoute(api)
-	SetOrderApiRoute(api)
-
-	return engine
+	api := engine.Group("/api")
+	router.SetOrderApiRoute(api, a.OrderHandler)
+	router.SetUserApiRoute(api, a.UserHandler)
+	
+	a.Engine = engine
 }
 
-func ReleaseRouter() *gin.Engine {
+func (a *App) releaseRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = io.Discard
-
-	engine := gin.New()
-
-	return engine
+	return gin.New()
 }

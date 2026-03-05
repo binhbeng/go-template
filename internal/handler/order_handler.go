@@ -5,16 +5,19 @@ import (
 	"github.com/binhbeng/goex/internal/service"
 	"github.com/binhbeng/goex/internal/utils"
 	"github.com/binhbeng/goex/internal/validation"
+	"github.com/binhbeng/goex/pkg/kafka"
 	"github.com/gin-gonic/gin"
 )
 
 type OrderHandler struct {
-	orderService *service.OrderService
+	orderService  *service.OrderService
+	kafkaProducer kafka.KafkaProducer
 }
 
-func NewOrderHandler(orderService *service.OrderService) *OrderHandler {
+func NewOrderHandler(orderService *service.OrderService, kafkaProducer kafka.KafkaProducer) *OrderHandler {
 	return &OrderHandler{
-		orderService: orderService,
+		orderService:  orderService,
+		kafkaProducer: kafkaProducer,
 	}
 }
 
@@ -43,6 +46,8 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 	if err := validation.ValidateBodyParams(c, &data); err != nil {
 		return
 	}
+
+	h.kafkaProducer.Produce(ctx , "order", data)
 
 	order, err := h.orderService.CreateOrder(ctx, userId, data)
 	if err != nil {
