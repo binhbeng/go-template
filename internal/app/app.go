@@ -15,23 +15,23 @@ import (
 )
 
 type App struct {
-	Engine        *gin.Engine
-	OrderHandler  *handler.OrderHandler
-	UserHandler   *handler.UserHandler
+	Engine       *gin.Engine
+	OrderHandler *handler.OrderHandler
+	UserHandler  *handler.UserHandler
 }
 
 func NewApp() *App {
 	config.Load()
 	data.InitData()
-	
+
 	kafkaProducer := kafka.NewKafkaProducer([]string{"localhost:9092"})
 
 	orderModule := NewOrderModule(kafkaProducer)
 	userModule := NewUserModule()
 
 	app := &App{
-		OrderHandler:  orderModule.Handler(),
-		UserHandler:   userModule.Handler(),
+		OrderHandler: orderModule.Handler(),
+		UserHandler:  userModule.Handler(),
 	}
 
 	app.setupRouter()
@@ -96,7 +96,7 @@ func (a *App) setupRouter() {
 	api := engine.Group("/api")
 	router.SetOrderApiRoute(api, a.OrderHandler)
 	router.SetUserApiRoute(api, a.UserHandler)
-	
+
 	a.Engine = engine
 }
 

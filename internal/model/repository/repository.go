@@ -25,4 +25,3 @@ func (m *Repository) DB(entity ...any) *gorm.DB {
 	}
 	return m.db
 }
-

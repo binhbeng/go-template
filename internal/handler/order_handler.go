@@ -47,7 +47,7 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	h.kafkaProducer.Produce(ctx , "order", data)
+	h.kafkaProducer.Produce(ctx, "order", data)
 
 	order, err := h.orderService.CreateOrder(ctx, userId, data)
 	if err != nil {

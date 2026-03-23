@@ -16,8 +16,8 @@ func NewProductModule() *ProductModule {
 	productService := service.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 	return &ProductModule{
-        productHandler: productHandler,
-    }
+		productHandler: productHandler,
+	}
 }
 
 func (m *ProductModule) Handler() *handler.ProductHandler {

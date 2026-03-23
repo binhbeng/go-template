@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/binhbeng/goex/cmd/worker"
 	"github.com/binhbeng/goex/cmd/cron"
 	"github.com/binhbeng/goex/cmd/server"
+	"github.com/binhbeng/goex/cmd/worker"
 	"github.com/spf13/cobra"
 )
 

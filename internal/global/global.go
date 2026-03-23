@@ -9,5 +9,5 @@ const (
 	RedisPrefix           = "goex:"
 	DefaultRequestTimeout = 5 * time.Second
 
-	Issuer  = "go-ex"
+	Issuer = "go-ex"
 )

@@ -20,7 +20,7 @@ var (
 		Short:   "Start worker",
 		Example: "go run main.go worker",
 		PreRun: func(cmd *cobra.Command, args []string) {
-			
+
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			run()
@@ -93,10 +93,10 @@ func run() {
 		}
 	})
 
-	<- ctx.Done()
+	<-ctx.Done()
 	fmt.Println("receive signal to stop worker")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := worker.Shutdown(shutdownCtx); err != nil {
 		fmt.Println("Shutdown failed")

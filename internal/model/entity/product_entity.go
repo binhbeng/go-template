@@ -1,8 +1,8 @@
 package entity
 
 import (
-	"gorm.io/plugin/soft_delete"
 	"github.com/binhbeng/goex/internal/utils/timeutil"
+	"gorm.io/plugin/soft_delete"
 )
 
 type Product struct {

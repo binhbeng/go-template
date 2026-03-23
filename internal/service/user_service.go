@@ -15,7 +15,6 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-
 type UserService struct {
 	userRepo *repository.UserRepository
 	redis    *redis.Client
@@ -86,6 +85,6 @@ func (s *UserService) GetListUser(ctx context.Context, req dto.QueryUsersInput) 
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return data, nil
 }

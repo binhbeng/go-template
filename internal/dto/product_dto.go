@@ -1,7 +1,6 @@
 package dto
 
-import (
-)
+import ()
 
 type ProductInput struct {
 	Example string `form:"example" json:"example"`
